@@ -1,0 +1,50 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: 97vh;
+}
+
+
+.input-box {
+    flex: 1;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.output-box {
+    display: flex;
+    flex-direction: row;
+    flex: 10;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.choropleth-map-div {
+    flex: 2;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.graphs-div {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.crime-breakdown-div {
+    flex: 1;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.timeseries-div {
+    flex: 1;
+    border: 2px solid black;
+    border-radius: 5px;
+}
