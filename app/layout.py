@@ -1,10 +1,6 @@
-import dash
 from dash import dcc, html
 
-
-app = dash.Dash(__name__)
-
-app.layout = html.Div([
+layout = html.Div([
     html.Div([
         dcc.Slider(
             id='monthly_slider',
@@ -19,18 +15,32 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
+            dcc.Graph(
+                id='crime_map',
+                figure = {}, 
+                className='scotland-map',
+                config = {'displayModeBar': False}
+                )
         ], className='choropleth-map-div'),
         html.Div([
             html.Div([
-
+                dcc.Graph(
+                    id='crime_breakdown_pie',
+                    figure={},
+                    # className='pie-chart',
+                    config={'displayModeBar': False}
+                    )
             ], className='crime-breakdown-div'),
             html.Div([
-
+                dcc.Graph(
+                    id='council_crime_timeseries',
+                    figure={},
+                    # className='timeseries-graph',
+                    config={'displayModeBar': False}
+                    )
             ], className='timeseries-div')
         ], className='graphs-div')
     ], className='output-box')
 ], className='main-container')
 
 
-if __name__ == "__main__":
-    app.run(debug=True)

@@ -48,3 +48,20 @@
     border: 2px solid black;
     border-radius: 5px;
 }
+
+
+.crime-map {
+    box-sizing: border-box;
+}
+
+.pie-chart {
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 80%;
+}
+
+.timeseries-graph {
+    border: 2px solid black;
+    border-radius: 5px;
+    height: 99%;
+}
