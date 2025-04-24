@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def population_data_ingestion(file_path:str) -> pd.DataFrame:
     '''
@@ -21,14 +22,14 @@ def population_data_ingestion(file_path:str) -> pd.DataFrame:
     population_df = population_df[population_df['Sex'] == 'Persons']
 
     #Keep the rows that contain the data we need
-    population_df = population_df[['Area name', 'Year', 'All Ages']]
-
-    #Pivot the table wider
-    population_df = population_df.pivot(index='Area name', columns='Year', values='All Ages').reset_index()
+    population_df = population_df[['Area name', 'Year', 'All Ages']].sort_values(by=['Area name', 'Year']).reset_index(drop=True)
 
     #Read the Council Area data into python
     try:
-        area_df = pd.read_csv('/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/Council_Area_Data.csv')
+        area_df = pd.read_csv('/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/Council_Area_Data.csv', dtype={
+            'Area name':str,
+            'Area':float
+        })
     except Exception as e:
         raise ValueError(f'Error in reading area data excel file: {e}')
 
@@ -36,11 +37,10 @@ def population_data_ingestion(file_path:str) -> pd.DataFrame:
     population_df = pd.merge(population_df, area_df, on='Area name')
 
     #Set the column order
-    col_order = ['Area name', 'Area'] + [col for col in population_df.columns if col not in ['Area name', 'Area']]
-    population_df = population_df[col_order]
+    population_df = population_df[['Area name', 'Area', 'Year', 'All Ages']]
 
-    #Convert the total population to population density
-    population_df.iloc[:, 2:] = population_df.iloc[:, 2:].div(population_df['Area'], axis=0)
+    #Calculate the population density
+    population_df['All Ages'] = population_df['All Ages'] / population_df['Area']
 
     return population_df
 
