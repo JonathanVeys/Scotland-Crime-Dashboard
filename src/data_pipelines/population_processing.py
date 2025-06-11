@@ -101,3 +101,4 @@ if __name__ == '__main__':
     processed_ward_area_data = ward_area_ingestion(ward_area_path)
 
     processed_population_density_data = population_density_processing(processed_population_data, processed_ward_area_data)
+    print(processed_population_density_data)

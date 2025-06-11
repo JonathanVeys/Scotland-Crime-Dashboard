@@ -18,21 +18,28 @@
 .output-box {
     display: flex;
     flex-direction: row;
-    flex: 10;
+    flex: 12;
     border: 2px solid black;
     border-radius: 5px;
 }
 
 .choropleth-map-div {
     flex: 2;
+    display: flex;
+    flex-direction: column;
     border: 2px solid black;
     border-radius: 5px;
+}
+
+.scotland-map {
+    flex-grow: 1;
+    width: 100%;
 }
 
 .graphs-div {
     display: flex;
     flex-direction: column;
-    flex: 3;
+    flex: 5;
     border: 2px solid black;
     border-radius: 5px;
 }

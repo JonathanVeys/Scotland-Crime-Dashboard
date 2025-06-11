@@ -2,7 +2,7 @@ import json
 import plotly.express as px
 import pandas as pd
 import numpy as np
-from population_processing import population_data_ingestion, ward_area_ingestion, population_density_processing
+from data_pipelines.population_processing import population_data_ingestion, ward_area_ingestion, population_density_processing
 
 # Load the GeoJSON data
 with open('/Users/jonathancrocker/Downloads/georef-united-kingdom-ward-electoral-division.geojson') as f:
@@ -27,10 +27,10 @@ fig = px.choropleth_map(
     locations='Ward_Code',         # column in df
     featureidkey='properties.wed_code',   # key in GeoJSON features
     color='Population_Density_log',              # the color will be based on the 'Size' column
-    color_continuous_scale="Viridis",     # Choose your color scale
+    color_continuous_scale=['green', 'limegreen', 'yellow', 'red', 'darkred'],     # Choose your color scale
     # map_style='carto-positron',
-    zoom=5.5,
-    center={"lat": 57.3, "lon": -4.2026},  # Centering the map over Scotland
+    zoom=6,
+    center={"lat": 56.7, "lon": -4.2026},  # Centering the map over Scotland
     opacity=0.6,
     hover_name='Ward_Name',
     hover_data={
@@ -41,7 +41,7 @@ fig = px.choropleth_map(
 )
 
 # Remove extra margin around the map
-fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
+                  coloraxis_showscale=False)
 # # Show the map
 fig.show()
