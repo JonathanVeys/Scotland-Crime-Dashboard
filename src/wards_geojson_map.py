@@ -19,29 +19,30 @@ processed_ward_area_data = ward_area_ingestion(ward_area_path)
 
 processing_population_density_data = population_density_processing(processed_population_data, processed_ward_area_data)
 processing_population_density_data['Population_Density_log'] = np.log(processing_population_density_data['Population_Density'])
+print(processing_population_density_data[processing_population_density_data['Year'] == '2001'].reset_index(drop=True))
 
-# Now, let's plot the choropleth map with Plotly
-fig = px.choropleth_map(
-    processing_population_density_data,
-    geojson=geojson_data,
-    locations='Ward_Code',         # column in df
-    featureidkey='properties.wed_code',   # key in GeoJSON features
-    color='Population_Density_log',              # the color will be based on the 'Size' column
-    color_continuous_scale=['green', 'limegreen', 'yellow', 'red', 'darkred'],     # Choose your color scale
-    # map_style='carto-positron',
-    zoom=6,
-    center={"lat": 56.7, "lon": -4.2026},  # Centering the map over Scotland
-    opacity=0.6,
-    hover_name='Ward_Name',
-    hover_data={
-        'Population_Density':True,
-        'Population_Density_log':False,
-        'Ward_Code':False
-    }
-)
+# # Now, let's plot the choropleth map with Plotly
+# fig = px.choropleth_map(
+#     processing_population_density_data,
+#     geojson=geojson_data,
+#     locations='Ward_Code',         # column in df
+#     featureidkey='properties.wed_code',   # key in GeoJSON features
+#     color='Population_Density_log',              # the color will be based on the 'Size' column
+#     color_continuous_scale=['green', 'limegreen', 'yellow', 'red', 'darkred'],     # Choose your color scale
+#     # map_style='carto-positron',
+#     zoom=6,
+#     center={"lat": 56.7, "lon": -4.2026},  # Centering the map over Scotland
+#     opacity=0.6,
+#     hover_name='Ward_Name',
+#     hover_data={
+#         'Population_Density':True,
+#         'Population_Density_log':False,
+#         'Ward_Code':False
+#     }
+# )
 
-# Remove extra margin around the map
-fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
-                  coloraxis_showscale=False)
-# # Show the map
-fig.show()
+# # Remove extra margin around the map
+# fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
+#                   coloraxis_showscale=False)
+# # # Show the map
+# fig.show()

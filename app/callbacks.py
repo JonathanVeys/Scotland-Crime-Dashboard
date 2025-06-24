@@ -1,13 +1,16 @@
 from dash import Output, Input
 import json
-import plotly.express as px
+import pandas as pd
 import numpy as np
+import plotly.express as px
 from src.data_pipelines.population_processing import population_data_ingestion, ward_area_ingestion, population_density_processing
 
 
 
+
 def register_callbacks(app):
-    crime_map_callback(app)
+
+    pass
 
 
 def crime_map_callback(app):
@@ -15,9 +18,12 @@ def crime_map_callback(app):
         Output('crime_map', 'figure'),
         Input('monthly_slider', 'value')
     )
-    def generate_crime_graph(month):
+    def generate_crime_graph():
         with open('/Users/jonathancrocker/Downloads/georef-united-kingdom-ward-electoral-division.geojson') as f:
             geojson_data = json.load(f)
+
+
+        # population_data = pd.read_excel('/Users/jonathancrocker/Downloads/estimated-population-by-sex-single-year-of-age-and-electoral-ward-mid-2001-to-mid-2021.xlsx', sheet_name='2021', skiprows=3)
 
         population_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/Raw Yearly Population Data/Scottish_Ward_Population.xlsx'
         processed_population_data = population_data_ingestion(population_path)
@@ -38,7 +44,7 @@ def crime_map_callback(app):
             color_continuous_scale=['green', 'limegreen', 'yellow', 'red', 'darkred'],     # Choose your color scale
             # map_style='carto-positron',
             zoom=6,
-            center={"lat": 58, "lon": -4.2026},  # Centering the map over Scotland
+            center={"lat": 56.7, "lon": -4.2026},  # Centering the map over Scotland
             opacity=0.6,
             hover_name='Ward_Name',
             hover_data={
