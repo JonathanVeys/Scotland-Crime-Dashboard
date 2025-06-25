@@ -109,12 +109,43 @@ def ward_size_gather() -> pd.DataFrame:
 
 
 
-if __name__ == '__main__':
-    # data = ward_pop_gather()
-    # print(data['2020'].head(10))
+def interpolate_column(df:pd.DataFrame, column_to_interpolate:str, grouping_column:str):
+    '''
+    Function that interpolates a column in a dataframe to fill in missing data
+    '''
+    df = df.set_index('Date')
 
-    data = ward_size_gather()
-    print(data.head(10))
+    interpolated_df = (
+        df[column_to_interpolate]
+        .groupby(df[grouping_column])
+        .resample('M')
+        .mean()
+        .interpolate(method='linear')
+        .reset_index()
+    )
+
+    return interpolated_df
+
+def ward_pop_processing(ward_pop:dict) -> pd.DataFrame:
+    '''
+    Data pipeline that takes the raw ward population data and create a time series, creating data for each month
+    '''
+    processed_ward_pop = {k:df[['Electoral Ward 2022 Name', 'Electoral Ward 2022 Code', 'Sex', 'Total']].assign(Date = k) for k,df in ward_pop.items() if str(k).isdigit()}
+
+    processed_ward_pop = pd.concat(processed_ward_pop.values(), ignore_index=True)
+    
+    processed_ward_pop['Date'] = pd.to_datetime(processed_ward_pop['Date'])
+
+    processed_ward_pop = interpolate_column(processed_ward_pop, 'Total', 'Electoral Ward 2022 Code')
+
+    return processed_ward_pop
+
+
+if __name__ == '__main__':
+    raw_ward_data = ward_pop_gather()
+    procesed_ward_data = ward_pop_processing(raw_ward_data)
+    print(procesed_ward_data)
+
 
 
 
