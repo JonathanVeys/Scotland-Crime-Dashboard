@@ -19,7 +19,6 @@ def get_ward_excel_link(soup:BeautifulSoup, search_id:str) -> str | None:
     
     return None
 
-
 def download_excel(href:str) -> bytes | None:
     '''
     Downloads the content of an Excel file from a given URL.
@@ -68,7 +67,6 @@ def ward_pop_gather() -> dict:
 
     return data
 
-
 def ward_size_gather() -> pd.DataFrame:
     '''
     Function that webscrappes data.gov to get the area data for the electoral wards.
@@ -89,6 +87,7 @@ def ward_size_gather() -> pd.DataFrame:
         print(response.status_code)
         print(response.headers)
         raise ValueError(f'Error: Status code:{response.status_code}')
+    
 
     soup = BeautifulSoup(response.content, "html.parser")
 
@@ -106,8 +105,6 @@ def ward_size_gather() -> pd.DataFrame:
 
     key = list(data.keys())[0]
     return data[key]
-
-
 
 def interpolate_column(df:pd.DataFrame, column_to_interpolate:str, grouping_column:str):
     '''
@@ -140,55 +137,7 @@ def ward_pop_processing(ward_pop:dict) -> pd.DataFrame:
 
     return processed_ward_pop
 
-
-if __name__ == '__main__':
-    raw_ward_data = ward_pop_gather()
-    procesed_ward_data = ward_pop_processing(raw_ward_data)
-    print(procesed_ward_data)
-
-
-
-
-
-def population_data_ingestion(data_path:str) -> pd.DataFrame:
-    '''
-    Reads and pre-processes the raw population data and outputs a processed population dataset as one continuous timeseries.
-
-    Paremeters:
-    -data_path: Path pointing to raw population data.
-
-    Output:
-    -processed_population_data: Returns a timeseries of the population of each electoral ward for each year from 2001 to 2021.
-    '''
-    try:
-        data_sheets = pd.ExcelFile(data_path)
-        sheet_names = data_sheets.sheet_names[2:]
-        data = {sheet: data_sheets.parse(sheet, skiprows=3) for sheet in sheet_names}
-    except Exception as e:
-        raise ValueError(f'Could not load data: {e}')
-    
-    data = pd.concat(
-        data.values(), 
-        keys=data.keys(), 
-        names=["Year"]).reset_index(level=0)
-    
-    #Selected the required columns
-    data = data[['Year', 'Electoral Ward 2022 Name', 'Electoral Ward 2022 Code', 'Sex', 'Total']]
-
-    #Filter the data to include only data for all sexes
-    data = data[data['Sex'] == 'Persons'].drop('Sex', axis=1)
-
-    #Sort the data and reset the index
-    data = data.sort_values(['Electoral Ward 2022 Name', 'Year']).reset_index(drop=True)
-
-    #Renamed the columns
-    processed_population_data = data.rename(columns={'Electoral Ward 2022 Name':'Ward_Name', 'Electoral Ward 2022 Code':'Ward_Code'})
-
-    return(processed_population_data)
-
-
-
-def ward_area_ingestion(data_path:str) -> pd.DataFrame:
+def ward_area_processing(data:pd.DataFrame) -> pd.DataFrame:
     '''
     Reads and pre-processes the ward area data and returns the processed data from the scotland wards.
 
@@ -198,11 +147,6 @@ def ward_area_ingestion(data_path:str) -> pd.DataFrame:
     Output:
     -data: Returns a dataframe with each ward and its respective area in km².
     '''
-
-    try:
-        data = pd.read_csv(data_path)
-    except Exception as e:
-        raise ValueError(f'Error: Could not load ward area data:{e}')
     
     data = data[['WD24CD', 'WD24NM', 'Shape__Area']]
 
@@ -210,44 +154,31 @@ def ward_area_ingestion(data_path:str) -> pd.DataFrame:
 
     data['Shape__Area'] = data['Shape__Area'] / 1e+6
 
-    data.rename(columns={'WD24CD':'Ward_Code', 'WD24NM':'Ward_Name'}, inplace=True)
-
-    return data
-
-def population_density_processing(population_data:pd.DataFrame, area_data:pd.DataFrame) -> pd.DataFrame:
-    '''
-    Combines the output from ward_area_ingestion and population_data_ingestion to calculate a population density for each electoral ward in Scotland.
-
-    Parameters:
-    -Population_data: A pandas dataframe with a timeseries for the population for each Electoral Ward.
-    -area_data: A pandas dataframe with the area in km² for each Scottish Electoral Ward.
-
-    Output:
-    -data: Output pandas dataframe with the a timeseries for the population density for each Scottish Electoral Ward.
-    '''
-
-    #Merge the population and area data into one dataframe
-    data = pd.merge(population_data, area_data, on='Ward_Code')
-
-    #Calculate the population density by dividing the total population for each Electoral Ward by it's area
-    data['Total'] = data['Total'] / data['Shape__Area']
-
-    #Select the necessary columns
-    data = data[['Year', 'Ward_Name_x', 'Ward_Code', 'Total']]
-
-    #Rename the columns to make them more clear
-    data.rename(columns={'Ward_Name_x':'Ward_Name', 'Total':'Population_Density'}, inplace=True)
+    data.rename(columns={'WD24CD':'Electoral Ward 2022 Code', 'WD24NM':'Ward_Name'}, inplace=True)
 
     return data
 
 
-
-# if __name__ == '__main__':
-#     population_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/Raw Yearly Population Data/Scottish_Ward_Population.xlsx'
-#     processed_population_data = population_data_ingestion(population_path)
+def main():
+    raw_ward_data = ward_pop_gather()
+    processed_ward_data = ward_pop_processing(raw_ward_data)
     
-#     ward_area_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/Raw Yearly Population Data/Electoral_Wards_Size.csv'
-#     processed_ward_area_data = ward_area_ingestion(ward_area_path)
+    raw_ward_area = ward_size_gather()
+    processed_ward_area = ward_area_processing(raw_ward_area)
 
-#     processed_population_density_data = population_density_processing(processed_population_data, processed_ward_area_data)
-#     print(processed_population_density_data)
+    processed_ward_area['Electoral Ward 2022 Code'] = processed_ward_area['Electoral Ward 2022 Code'].astype(str)
+    processed_ward_data['Electoral Ward 2022 Code'] = processed_ward_data['Electoral Ward 2022 Code'].astype(str)
+
+    pop_den_data = processed_ward_data.merge(processed_ward_area, on='Electoral Ward 2022 Code')
+    pop_den_data['Population_Density'] = pop_den_data['Total'] / pop_den_data['Shape__Area']
+
+    pop_den_data = pop_den_data[['Electoral Ward 2022 Code', 'Ward_Name', 'Date', 'Total', 'Shape__Area', 'Population_Density']]
+
+    print(pop_den_data.sort_values('Population_Density'))
+    print(pop_den_data[pop_den_data['Population_Density'] == pop_den_data['Population_Density'].max()])
+
+    return([pop_den_data])
+
+if __name__ == '__main__':
+    main()
+
