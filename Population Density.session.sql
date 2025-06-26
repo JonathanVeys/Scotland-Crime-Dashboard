@@ -1,0 +1,1 @@
+SELECT * from electoral_ward_population_density;

@@ -115,7 +115,7 @@ def interpolate_column(df:pd.DataFrame, column_to_interpolate:str, grouping_colu
     interpolated_df = (
         df[column_to_interpolate]
         .groupby(df[grouping_column])
-        .resample('M')
+        .resample('MS')
         .mean()
         .interpolate(method='linear')
         .reset_index()
@@ -174,8 +174,7 @@ def main():
 
     pop_den_data = pop_den_data[['Electoral Ward 2022 Code', 'Ward_Name', 'Date', 'Total', 'Shape__Area', 'Population_Density']]
 
-    print(pop_den_data.sort_values('Population_Density'))
-    print(pop_den_data[pop_den_data['Population_Density'] == pop_den_data['Population_Density'].max()])
+    pop_den_data = pop_den_data.rename(columns={'Electoral Ward 2022 Code':'Electoral_Ward_2022_Code'})
 
     return([pop_den_data])
 
