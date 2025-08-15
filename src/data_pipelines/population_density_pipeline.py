@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from scraping.web_scraping import get_ward_excel_link, download_excel, read_excel_sheets
+from scraping.utils import get_ward_excel_link, download_excel, read_excel_sheets
 from preprocessing.data_preprocessing import ward_pop_processing, ward_area_processing
 from DB.update_database import update_db
 
@@ -33,12 +33,13 @@ def ward_pop_gather() -> dict:
     if not file_url:
         raise ValueError('Error: File URL is None')
 
-    content = download_excel(file_url)
+    data = download_excel(file_url, sheet_name='2001')
+    print(data)
     
-    if content is not None:
-        data = read_excel_sheets(content, 3)
-    else:
-        raise ValueError('Error: Content cannot be empty')
+    # if content is not None:
+    #     data = read_excel_sheets(content, 3)
+    # else:
+    #     raise ValueError('Error: Content cannot be empty')
 
     return data
 
@@ -66,6 +67,7 @@ def ward_size_gather() -> pd.DataFrame:
         raise ValueError("Error: File URL is None")
     
     content = download_excel(file_url)
+    print(content)
 
     if content is not None:
         print(content)

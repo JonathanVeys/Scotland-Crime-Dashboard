@@ -1,6 +1,3 @@
-import os
-from dotenv import load_dotenv
-# from data_pipelines.population_processing import main as main_pop_dens
 import pandas as pd
 from sqlalchemy import create_engine
 

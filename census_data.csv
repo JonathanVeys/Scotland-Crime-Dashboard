@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--[if lt IE 9]>
+    <script>
+      document.createElement('header');
+      document.createElement('nav');
+      document.createElement('section');
+      document.createElement('article');
+      document.createElement('aside');
+      document.createElement('footer');
+    </script>
+    <![endif]-->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>API - Nomis - Official Census and Labour Market Statistics</title>
+
+    <meta name="description" content="nomis - official labour market statistics" />
+    <meta name="keywords" content="annual business inquiry" />
+    <meta name="viewport" content="initial-scale=1" />
+    <meta charset="UTF-8" />
+    <link title="Easy Access version" rel="alternate" href="/home/accesskeys.htm" media="aural, braille, tty">
+    <link rel="alternate" type="application/rss+xml" title="Nomis RSS News Feed" href="/articles/rssArticles.asp" />
+    <link rel="alternate" type="application/rss+xml" title="Nomis RSS Release Dates Feed" href="/home/rssRelease_dates.asp" />
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    
+    <link rel="stylesheet" href="/libs/jqueryui/jquery-ui.min.css" />
+    <link rel="stylesheet" href="/libs/jquery-simplePagination/simplePagination.min.css" />
+    <link rel="stylesheet" href="/libs/leaflet/leaflet.css" type="text/css" />
+
+    <link rel="stylesheet" href="/css/nomis.css" type="text/css" />
+    <link rel="stylesheet" href="/css/standard.css" type="text/css" />
+    <link rel="stylesheet" href="/css/nomis-ui.css" type="text/css" />
+    <link rel="stylesheet" href="/css/menubar.css" type="text/css" />
+    <link rel="stylesheet" href="/css/responsive.css" type="text/css" />
+    <link rel="stylesheet" href="/css/print.css" type="text/css" media="print" />
+
+    <!--[if Safari]>
+        <link rel="stylesheet" href="/css/safari-nomis.css" type="text/css" />
+    <![endif]-->
+
+    <script type="text/javascript" src="/libs/modernizr/modernizr.min.js"></script>
+    <script type="text/javascript" src="/libs/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/libs/jquery-cookie/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="/libs/jquery-simplePagination/jquery.simplePagination.min.js"></script>
+    <script type="text/javascript" src="/libs/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/libs/jqueryui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <script type="text/javascript" src="/libs/leaflet/leaflet.min.js"></script>
+    
+    <style>
+        .prefFntCtrl:hover, .prefFntCtrl:visited { color: #00B; }
+        .prefFntCtrl { border: 1px solid transparent; padding: 1px; }
+        .activeFntSz { border-color: #00b; font-weight: normal; }
+        #nomisweb-organisation-name-title:hover { text-decoration: underline; }
+        .fa-search { border: 0; padding: 0.7em; background: #5f7d41; font-size: 13px; color: #fff; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+        .fa-search:hover { cursor: pointer; }
+    </style>
+    <script type="text/javascript">
+        // Include D3 for browsers that support it
+        if (Modernizr.inlinesvg) { document.write ('<script type="text\/javascript" src="\/libs\/d3\/d3.min.js"><\/script>'); }
+    </script>
+        
+    <script type="text/javascript" src="/js/PageScripts.js"></script>
+    <script type="text/javascript" src="/js/nomis-core.js"></script>
+	<script type="text/javascript" src="/js/nomis-geography.js"></script>
+    <script type="text/javascript" src="/js/nomis-api.js"></script>
+    <script type="text/javascript" src="/js/nomis-ui.js"></script>
+    <script type="text/javascript" src="/js/nomis-stat.js"></script>
+    <script type="text/javascript" src="/js/cookies.js"></script>
+       
+	<script type="text/javascript">
+        const GA_TRACKING_ID = 'UA-3628896-1';
+
+        // Disable GA by default
+        window[`ga-disable-${GA_TRACKING_ID}`] = true;
+        if(hasCookieConsent()){
+            // Enable GA if consent is given
+            window[`ga-disable-${GA_TRACKING_ID}`] = false;
+
+            (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', GA_TRACKING_ID, 'auto');
+            ga('send', 'pageview');
+        }else{
+            // Cookies disabled 
+        	function ga(){};
+        }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script>
+    // Set GA4 Measurement ID
+    const GA4_MEASUREMENT_ID = 'G-LMNEJ7PM1T';
+
+    // Disable GA4 by default
+    window[`ga-disable-${GA4_MEASUREMENT_ID}`] = true;
+
+    if (hasCookieConsent()) {
+        // Enable GA4 if consent is given
+        window[`ga-disable-${GA4_MEASUREMENT_ID}`] = false;
+
+        // Load the GA4 script
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`;
+        document.head.appendChild(script);
+
+        script.onload = function () {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', GA4_MEASUREMENT_ID);
+        };
+    }else{
+        // Cookies disabled 
+        function gtag(){};
+    }
+    </script>
+
+    <!-- Google Tag Manager -->
+    <script>
+        if(hasCookieConsent()){
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-NJWJX69');
+        }
+    </script>
+    <!-- End Google Tag Manager -->
+
+</head>
+<body onload="javascript:try { pageLoaded(); } catch(er) { }" onunload="javascript:try { pageUnloaded(); } catch(er) { }">
+    <div role="status" id="titleStatusDiv" class="visually-hidden"></div>
+    <div id="nomis-webpage">
+        <div id="cookie-consent-wrapper" aria-labelledby="cookie-consent-heading" style="display: none;" role="alert">
+            <h1 id="cookie-consent-heading">Cookie Consent</h1>
+            <div class="cookie-container">
+                <div id="outstanding-cookie-decision-panel">
+                    <p id="cookie-consent-info">We use cookies to ensure you get the best experience on our website and to remember if you've accepted cookies.</p>
+                    <br>
+                    <button id="cookie-consent-accept-button" class="positive" aria-labelledby="cookie-consent-accept" onclick="cookieAccept();" title="Consent to the use of cookies" type="button">Accept Cookies</button>
+                    <button id="cookie-consent-decline-button" class="positive" aria-labelledby="cookie-consent-decline" onclick="cookieDecline();" title="Decline the use of cookies" type="button">Decline Cookies</button>
+                    <a href="/home/cookies.asp" id="cookie-link" title="Read about how cookies are used on the Nomis web site">View cookie policy</a>
+                </div>
+                <div id="confirmed-cookie-decision-panel" style="display: none;">
+                    <p>Thanks for confirming your cookie preference. You can view or change your <a href="javascript: showSitePrefs();">cookie settings</a> at any time.</p>
+                    <input id="cookie-consent-dismiss-button" aria-labelledby="cookie-consent-terms" onclick="cookieConsentDismiss();" title="Hide this message about cookies" type="button" value="Hide" />
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function shouldDisplayCookieConsent() { return $.cookie('cookie-consent') === undefined; }
+            function cookieAccept(){$('#outstanding-cookie-decision-panel').css('display', 'none'); $('#confirmed-cookie-decision-panel').css('display', 'block'); setCookieConsent(true);}
+            function cookieDecline(){$('#outstanding-cookie-decision-panel').css('display', 'none'); $('#confirmed-cookie-decision-panel').css('display', 'block'); setCookieConsent(false);}
+            function cookieConsentDismiss() { $('#cookie-consent-wrapper').slideUp(800); }
+            if (shouldDisplayCookieConsent()) { $('#cookie-consent-wrapper').css('display', 'block'); }
+        </script>
+        <div id="org-name-and-logo-wrapper" role="banner" aria-labelledby="nomisweb-organisation-name-title nomisweb-organisation-name-subtitle" style="overflow: hidden;">
+            <div class="hidden-until-focus">
+                <a href="#content-anchor" accesskey="s" class="skiptocontent">Skip to content</a>
+                <a href="/home/accessibility.asp" title="navigation link to Nomis website accessibility guide page">Skip to accessibility help</a>
+            </div>
+            <div id="nomisweb-organisation-name">
+                <div id="nomisweb-main-title-container"> <div id="nomisweb-organisation-name-title"><a href="/" accesskey="1">nomis</a></div> </div>
+                <div id="nomisweb-subtitle-container"> <div id="nomisweb-organisation-name-subtitle">official census and labour market statistics</div> </div>
+            </div>
+            <div class="nomisweb-ons-logo" style="float: none; text-align: right; margin-right: 0;">
+                <a href="https://www.ons.gov.uk">
+                    <img alt="National Statistics Logo" src="/images/ons-logo.svg" style="margin-top: 0; float: none; width: 19.7em;">
+                </a>
+                <div class="page-heading-tools" style="padding-left: 0 !important; background-color: #fff; margin-right: -5px; margin-top: 0; padding: 0 !important; clear: none;">
+                    <form id="site-search" onsubmit="if(document.getElementById('site-search-term').value == 'Search Nomis...') return false; else return true;" action="/home/Search" method="GET">
+                        <input type="hidden" id="site-search-context" name="context" value="" />
+                        <label class="obscure" for="site-search-term" id="lblsite-search-term">Search term</label>
+                        <input type="search" id="site-search-term" name="term" maxlength="75" aria-labelledby="lblsite-search-term" style="border: 1px solid #ddd; margin-right: 0; padding: 0.2em;" value="" />
+                        <button type="submit" style="padding: 0; border: 0;" title="Search" accesskey="4"><i class="fa fa-search"></i></button>
+                        <script type="text/javascript">
+                            NomisCore.setPlaceholder('site-search-term', 'Search...');
+                        </script>
+                    </form>
+                </div>               
+            </div>
+            
+        </div>
+        <!-- PRE-SITE-NAV-BANNER-HOOK -->
+        <div id="site-nav-banner">
+            <div id="menu-control">
+                <a title="Show/Hide site navigation menu" href="javascript:  $('#nomis-top-main-nav-wrapper').slideToggle(); event.preventDefault();"><img src="/images/menu.gif" alt="Picture of three horizontal lines representing a menu" /> Menu</a>
+                <a title="Set site preferences" href="javascript: showSitePrefs();"><img src="/images/cog.gif" alt="Picture of a cog representing settings for the web site" /></a>
+            </div>
+            <!-- Begin site navigation banner section -->
+            <div id="nomis-top-main-nav-wrapper" role="navigation" aria-label="Site Navigation">
+                <nav>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="/" accesskey="1">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/home/profiles.asp">Reports</a>
+                            <div class="sub-nav">
+                                <h1>Area reports</h1>
+                                <ul>
+                                    <li><a href="/reports/localarea">Local Area Report (district/county and smaller areas)</a></li>
+                                    <li><a href="/reports/lmp/la/contents.aspx">Local Authority Profile (district/county areas)</a></li>
+                                    <li><a href="/reports/lmp/lep/contents.aspx">Local Enterprise Partnerships Profile</a></li>
+                                    <li><a href="/reports/lmp/gor/contents.aspx">Regional and National Profile</a></li>
+                                    <li><a href="/reports/lmp/comb/contents.aspx">Combined Authority Profile</a></li>
+                                    <li><a href="/reports/lmp/wpca/contents.aspx">2010 Parliamentary Constituencies Profile</a></li>
+                                    <li><a href="/reports/lmp/ward2011/contents.aspx">2011 Ward Profile</a></li>
+                                </ul>
+                                
+                                <h1>Topic reports</h1>
+                                <ul>
+                                    <li><a href="/datasets/aps218/reports/employment-by-occupation">Employment by occupation (SOC2020) by sex</a></li>
+                                    <li><a href="/datasets/aps218/reports/employment-by-status-and-occupation">Occupation (SOC2020) by sex, employment status and full/part-time</a></li>
+                                    <li><a href="/datasets/aps218/reports/employment-by-temp-workers">Temporary and permanent employees by sex and broad occupation (SOC2020)</a></li>
+                                    <li><a href="/datasets/aps218/reports/employment-by-part-time-workers">Employment by broad occupation (SOC2020) for part-time workers</a></li>
+                                    <li><a href="/datasets/aps218/reports/employment-by-sex-by-ftpt-by-emp-self">Broad occupation (SOC2020) by sex, employment status and full/part-time time-series</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a id="A5" href="/sources">Data Sources</a>
+                            <div class="sub-nav">
+                                <ul>
+                                    <li><a href="/sources/acses">Annual Civil Service Employment Survey</a></li>
+                                    <li><a href="/sources/aps">Annual Population Survey/Labour Force Survey</a></li>
+                                    <li><a href="/sources/ashe">Annual Survey of Hours and Earnings</a></li>
+                                    <li><a href="/sources/bres">Business Register and Employment Survey</a></li>
+                                    <li><a href="/sources/census">Census</a></li>
+                                    <li><a href="/sources/cc">Claimant Count</a></li>
+                                    <li><a href="/sources/dwp">DWP Benefits</a></li>
+                                    <li><a href="/sources/housing">Housing</a></li>
+                                    <li><a href="/sources/eop">Economic output and productivity</a></li>
+                                    <li><a href="/sources/jd">Jobs Density</a></li>
+                                    <li><a href="/sources/jsa">Jobseekers Allowance</a></li>
+                                    <li><a href="/sources/life">Life Events</a></li>
+                                    <li><a href="/sources/pest">Population Estimates/Projections</a></li>
+                                    <li><a href="/sources/ra">Regional Accounts</a></li>
+                                    <li><a href="/sources/ukbc">UK Business Counts</a></li>
+                                    <li><a href="/sources/wfj">Workforce Jobs</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a id="A6" href="/sources/census">Census</a>
+                            <div class="sub-nav">
+                                <ul>
+                                    <li><a href="/sources/census_2021">2021 Census</a></li>
+                                    <li><a href="/sources/census_2011">2011 Census</a></li>
+                                    <li><a href="/sources/census_2001">2001 Census</a></li>
+                                    <li><a href="/sources/census_1991">1991 Census</a></li>
+                                    <li><a href="/sources/census_1981">1981 Census</a></li>
+                                    <li><a href="/sources/census_1961">1961 Census</a></li>
+                                    <li><a href="/sources/census_1951">1951 Census</a></li>
+                                    <li><a href="/sources/census_1931">1931 Census</a></li>
+                                    <li><a href="/sources/census_1921">1921 Census</a></li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a id="A8" href="/home/contacts.asp">Contact us</a>
+                        </li>
+
+                        <li class="nav-item nav-my-account">
+                            <a id="A7" href="/myaccount/overview.asp" title="My account overview">Sign-in</a>
+                            <div class="sub-nav">
+                                <div style="display: none;">
+                                    
+                                    <ul>
+                                        <li><a href="/myaccount/overview.asp">My account</a></li>
+                                    </ul>
+                                </div>
+                                <div id="menu-my-account-not-signed-in">
+                                    <h1>You're not signed in</h1>
+                                    <ul>
+                                        <li><a id="signin_link" href="/login/login.asp" title="Sign-in and return to the current page">Sign-in</a></li>
+                                    </ul>
+                                    <h1>New to Nomis?</h1>
+                                    <p>You can use most parts of this site without registering.</p>
+                                    <ul>
+                                        <li><a href="/myaccount/userjoin.asp">Register</a></li>
+                                        <li><a href="/home/register.asp">Benefits of registering</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <a id="nomisweb-prefs-link" title="Site settings" href="javascript: showSitePrefs();"><img src="/images/cog.gif" alt="Picture of a cog representing settings for the web site" /><span>Settings</span></a>
+
+                <!-- initialize a selector as an accessibleMegaMenu -->
+                <script type="text/javascript">
+                    var mmansi = document.getElementById('menu-my-account-not-signed-in');
+
+                    // Only change sign-in urls if the user is not logged in
+                    if (mmansi != null && mmansi != undefined && mmansi.style != undefined && mmansi.style.display != 'none') {
+                        var signina = document.getElementById('signin_link');
+                        var a7a = document.getElementById('A7');
+
+                        var signin_tgt = window.location.pathname
+                        var signin_par = window.location.search;
+                        if (signin_par.length > 0) signin_par = signin_par.substring(1); // Remove ?
+                        signin_par = encodeURIComponent(signin_par);
+
+                        var signin_hrefp = '?target=' + signin_tgt + '&params=' + signin_par;
+
+                        if (signina != null && signina != undefined) signina.href = signina.href + signin_hrefp; // Make sub-menu sign-in link target go to same page
+                        if (a7a != null && a7a != undefined) a7a.href = '/login/login.asp' + signin_hrefp; // Initially make my account link target go to same page
+                    }
+                </script>
+                <script src="/libs/jquery-accessibleMegaMenu.js"></script>
+                <script type="text/javascript">
+                    $("nav:first").accessibleMegaMenu({
+                        uuidPrefix: "accessible-megamenu",
+                        menuClass: "nav-menu",
+                        topNavItemClass: "nav-item",
+                        panelClass: "sub-nav",
+                        panelGroupClass: "sub-nav-group",
+                        hoverClass: "hover",
+                        focusClass: "focus",
+                        openClass: "open"
+                    });
+                </script>
+            </div>
+            <!-- End site navigation banner section -->
+            <!-- Begin breadcrumbs -->
+            <div id="breadcrumbs-wrapper">
+                <div id="BCBox" class="breadcrumbs" role="navigation" aria-label="Breadcrumbs"></div>
+            </div>
+            <!-- End breadcrumbs -->
+            <script type="text/javascript">
+                var BaseBreadCrumbs = new Array('/default.asp', 'home');
+                SetBreadCrumbs(null);
+            </script>
+
+            <div id="skip-to-content"><a id="content-anchor"></a></div>
+<div id="page-heading-and-sub-nav"><h1>Nomis API</h1>
+<div class="sub-title-section">RESTful API (v01)</div></div>
+</div>
+<!-- End site navigation banner section -->
+<div id="page-wrap" role="main">
+<!-- Begin page content -->
+
+
+    <style type="text/css" id="pagestyle">
+    form a
+    {
+      font-family: courier;
+      font-size: 8pt;
+      text-decoration: none;
+      color: #0000dd;
+    }
+    form a:hover
+    {
+      text-decoration: underline;
+    }
+    form p { padding-left: 5px; padding-right: 5px; }
+    form h1
+    {
+      font-size: 12pt;
+      background: #a0a0a0;
+      color: #ffffff;
+      padding: 5px;
+      margin: 0px;
+    }
+    form h2 { font-size: 10pt; padding-left: 5px; padding-right: 5px; }
+    form h3 { font-size: 8pt; font-weight: bold; padding-left: 5px; padding-right: 5px;  }
+    .profilerbox
+    {
+      padding: 5px;
+      border: 2px solid #cedece;
+      background: #eff7ef;
+      margin-bottom: 20px;
+    }
+    .note
+    {
+       font-style: italic;
+    }
+    .example, .example_html, .example_xml, .example_json
+    {
+       margin: 5px;
+       padding: 5px;
+       border: 2px solid #e9eaea;
+       background: #efeeee;
+    }
+    .example td { color: #700000; }
+    .example_html td { color: #700000; }
+    .example_xml td { color: #700000; }
+    .example_json td { color: #700000; }
+    .terminology td { font-size: 7pt; }
+    .simple, .discovery, .delivery, .terminology, .perma
+    {
+       border: 2px solid #a0a0a0;
+       margin-bottom: 15px;
+       padding-bottom: 5x;
+    }
+    pre
+    {
+       color: #0000a0;
+       font-family: courier;
+       font-size: 8pt;
+    }
+
+    </style>
+    <script type="text/javascript">
+        function setDisplay(className, show)
+        {
+            var elem = document.getElementsByTagName('div');
+            
+            for(i = 0; i < elem.length; i++)
+            {
+                if(elem[i].className != null && elem[i].className.indexOf(className) >= 0)
+                {
+                    if(!show) elem[i].style.display = 'none';
+                    else elem[i].style.display = 'block';
+                }
+            }
+        }
+    </script>
+
+    <form id="form1">
+    <div>
+        <p> This is the Nomis RESTful API you can use it to perform a variety of structural discovery and data
+            download requests. We have support for SDMX (presented as either XML or JSON), RSS feeds, CSV, JSON data downloads,
+            Microsoft Excel downloads and respond to GET and POST requests.</p>
+
+        <div class="profilerbox">
+            <p> <b>To show help relevant to your requirements let us know how you plan to use the API...</b></p>
+            <p> I would like to know about...
+                <table cellpadding="3">
+                    <tr>
+                        <td><input type="radio" name="profilerUsage" value="" onclick="setDeliveryAndDiscovery();" checked="true"/></td>
+                        <td><b>Discovery and Delivery</b><br />You need to find out what datasets, dimensions and codes are
+                            available, and how to download the required data.</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="profilerUsage" value="" onclick="setDiscoveryOnly();"/></td>
+                        <td><b>Discovery only</b><br />You only need to find the datasets, dimensions and codes that are available.</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="profilerUsage" value="" onclick="setDeliveryOnly();"/></td>
+                        <td><b>Delivery only</b><br />You only need to know how to download data.</td>
+                    </tr>
+                </table>
+            </p>
+            
+            <p> I prefer to work with...
+                <table cellpadding="3">
+                    <tr>
+                        <td><input type="radio" name="profilerFmt" value="" onclick="setAny();" checked="true"/></td>
+                        <td><b>All types of document</b><br />Help will be shown with all available examples (XML, JSON and HTML).</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="profilerFmt" value="" onclick="setNoKnow();" /></td>
+                        <td><b>HTML documents</b><br />Choose this if you have little knowledge of SDMX, XML or JSON (includes help on using our JavaScript class)</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="profilerFmt" value="" onclick="setXMLOnly();" /></td>
+                        <td><b>XML documents</b><br />Examples containing XML resources will be used.</td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="profilerFmt" value="" onclick="setJSONOnly();" /></td>
+                        <td><b>JavaScript Object Notation (JSON) files</b><br />Examples will be tailored to the JSON format.</td>
+                    </tr>
+                </table>
+            </p>
+            
+        </div>
+        
+        <div class="terminology">
+            <h1>Terminology</h1>
+                <p> The table below contains some of the terminology used in the API and supporting documentation, you might find it
+                    helpful to look at these before getting started:
+                    <table cellpadding="3">
+                        <tr><td>RESTful</td>        <td>REpresentational State Transfer, a software architecture for distributed systems, in this case using HTTP GET requests (for example when you ask for a URI in you web browser).</td></tr>
+                        <tr><td>URI</td>            <td>Universal Resource Identifier, a string of characters used to identify a resource on the internet.</td></tr>
+                        <tr><td>API</td>            <td>Application Programming Interface, an interface implemented by a software program to enable interaction with other software.</td></tr>
+                        <tr><td>XML</td>            <td>A set of rules for encoding documents electronically.</td></tr>
+                        <tr><td>SDMX</td>           <td>Statistical Data and Metadata eXchange, ISO standard to describe datasets, dimensions and data.</td></tr>
+                        <tr><td>JSON</td>           <td>JavaScript Object Notation, a simple text-based format for representing simple data structures and associative arrays.</td></tr>
+                        <tr><td>KeyFamily</td>      <td>A Nomis dataset, described in SDMX.</td></tr>
+                        <tr><td>KeyFamilies</td>    <td>A collection of Nomis datasets described in SDMX.</td></tr>
+                        <tr><td>Dimension</td>      <td>These are the things that make up a dataset (e.g. Geography, Family Type, Age, Duration).</td></tr>
+                        <tr><td>Codelist</td>       <td>List of codes and descriptions that are applicable to a Dimension.</td></tr>
+                        <tr><td>Concept</td>        <td>The name for a dimension, if you were writing an application to display data, this is the name you would want to display for the dimension.</td></tr>
+                        <tr><td>Metadata</td>       <td>Information about something, for example further descriptive text for a code, often shown either using annotations or in a dedicated Metadata XML file.</td></tr>
+                    </table>
+                </p>
+                
+                <p class="note">Please note that the example URIs in this document assume a web root of "http://www.nomisweb.co.uk".</p>
+        </div>
+ 
+        <div class="perma">
+            <h1>Concurrently running requests</h1>
+            <p>The number of concurrently running requests to the API is limited. To avoid limits being reached, try to run as few requests concurrently as possible. For more information on the specific limits set please contact the Nomis helpdesk.</p>
+        </div>
+        
+        <div class="simple">
+            <h1>Tool to help you build a URI</h1>
+                <p>If you need help creating API links or don't want to get into learning the full API you can use the <a href="/query/advanced.aspx">Query data</a> interface to select the required data and get an API link from there.</p>
+                <p>When you go to the "format / layout" page of your query, select "Nomis API" format. Your selections will be converted to API links in a variety of formats.</p>
+                <p>You will also be given the option to remove columns you don't need, change their order and see how the data will look with a live preview table.</p>
+        </div>
+
+        <div class="simple">
+            <h1>View a Summary of your URI</h1>
+                <p> The summary page is a web page that shows the selections you have made for each
+                    dimension in your URI. It highlights any invalid Concepts or Codelist codes you
+                    may have specified, as well as indicating dimensions that you have
+                    specified. At the bottom of the summary page, there is a selection of download URIs
+                    for the various formats available.</p>
+                    <p>At any point in constructing your RESTful URI, append "/summary" to see this page.</p>
+                
+                <div class="example">Example:
+                    <table>
+                        <tr>
+                            <td>Summary of a query. This shows that you have not yet filtered ITEM and MEASURES.</td>
+                            <td><a id="HyperLink12" href="/api/v01/dataset/NM_1_1/summary?geography=2092957697&sex=5">/api/v01/dataset/NM_1_1/summary?geography=2092957697&sex=5</a></td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+                
+        <div class="discovery">
+            <h1>Discover available datasets</h1>
+            <p> A "structure:KeyFamily" node provides you with an outline of the structure
+                of the data and includes the name of the Keyfamily in the "structure:Name" node,
+                and a description in the "structure:Description" node. There is a "structure:Components"
+                node, that contains a number of "structure:Dimension" nodes detailing the concepts
+                and codelists that relate to that dimension. This information is fundamental in
+                determining how to build your query.</p>
+                
+                <h2>Complete list of datasets</h2>
+                    <p> You can obtain a complete list of all the Nomis datasets that are available
+                        to query using this API in one request.</p>
+                        
+                    <div class="example_xml">Example (XML):
+                            <table>
+                                <tr>
+                                    <td>Get an SDMX Structure document with a "KeyFamilies" node, containing a number of "structure:Keyfamily" nodes</td>
+                                    <td><a id="HyperLink5" href="/api/v01/dataset/def.sdmx.xml">/api/v01/dataset/def.sdmx.xml</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Use the "id" attribute from one of these nodes to get the structure of an individual dataset, in this case the "Jobseeker's Allowance with Rates and Proportions" dataset</td>
+                                    <td><a id="HyperLink31" href="/api/v01/dataset/NM_1_1/def.sdmx.xml">/api/v01/dataset/NM_1_1/def.sdmx.xml</a></td>
+                                </tr>
+                            </table>
+                    </div> 
+
+                    <div class="example_json">Example (JSON):
+                            <table>
+                                <tr>
+                                    <td>Get a JSON file with "keyfamilies" variable, containing an array of "keyfamily" nodes</td>
+                                    <td><a id="HyperLink32" href="/api/v01/dataset/def.sdmx.json">/api/v01/dataset/def.sdmx.json</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Use the "id" attribute from one of the variables to get the structure of an individual dataset, in this case the "Jobseeker's Allowance with Rates and Proportions" dataset</td>
+                                    <td><a id="HyperLink33" href="/api/v01/dataset/NM_1_1/def.sdmx.json">/api/v01/dataset/NM_1_1/def.sdmx.json</a></td>
+                                </tr>
+                            </table>
+                    </div> 
+                    
+                    <div class="example_html">Example (HTML):
+                            <table>
+                                <tr>
+                                    <td>View a web page with information about each of the datasets available</td>
+                                    <td><a id="HyperLink6" href="/api/v01/dataset/def.htm">/api/v01/dataset/def.htm</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Use the "id" from one of these datasets to get just the structure that dataset, in this case the "Jobseeker's Allowance with Rates and Proportions" dataset</td>
+                                    <td><a id="HyperLink29" href="/api/v01/dataset/NM_1_1/def.htm">/api/v01/dataset/NM_1_1/def.htm</a></td>
+                                </tr>
+                            </table>
+                    </div> 
+                    
+                    
+                    <h3>Search</h3>
+                    <p> You can also search for a dataset with Name, Description or Keyword
+                        that matches a given search term by appending "search=term". Wildcard character is "*", match is not case sensitive.</p>
+
+                    <p> If you want to search for a term within a specific part of the dataset definition you can prepend one of the following:
+                        <ul>
+                            <li><b>name-</b> this will search for datasets with a name matching the term that follows.</li>
+                            <li><b>description-</b> this will search for datasets with a description matching the term that follows.</li>
+                            <li><b>keywords-</b> this will search for datasets with a keyword matching the term that follows.</li>
+                            <li><b>contenttype-&lt;contenttype&gt;[-id]</b> this will search for datasets with an associated contenttype defined and optionally a matching id within that contenttype.</li>
+                            <li><b>units-</b> this will search for datasets with units matching the term that follows.</li>
+                        </ul>
+                        A narrow search using the method above will perform more quickly than a general search. Contentype and units are not searched by default.
+                    </p>
+
+                    <p> You can search for multiple terms at once by separating them with a comma (",").</p>
+                
+                    <div class="example_xml">Example (XML):
+                        <table>
+                            <tr>
+                                <td>Search for KeyFamilies containing "Claimant" in their name or description</td>
+                                <td><a id="HyperLink16" href="/api/v01/dataset/def.sdmx.xml?search=*claimant*">/api/v01/dataset/def.sdmx.xml?search=*claimant*</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for KeyFamilies containing the Keyword "Ethnic"</td>
+                                <td><a id="HyperLink222" href="/api/v01/dataset/def.sdmx.xml?search=keywords-ethnic*">/api/v01/dataset/def.sdmx.xml?search=keywords-ethnic*</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="example_json">Example (JSON):
+                        <table>
+                            <tr>
+                                <td>Search for KeyFamilies containing "Claimant" in their name or description</td>
+                                <td><a id="HyperLink52" href="/api/v01/dataset/def.sdmx.json?search=*claimant*">/api/v01/dataset/def.sdmx.json?search=*claimant*</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for KeyFamilies containing the Keyword "Ethnic"</td>
+                                <td><a id="HyperLink23" href="/api/v01/dataset/def.sdmx.json?search=keywords-ethnic*">/api/v01/dataset/def.sdmx.json?search=keywords-ethnic*</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    
+                    <div class="example_html">Example (HTML):
+                        <table>
+                            <tr>
+                                <td>Search for KeyFamilies containing "Claimant" in their name or description</td>
+                                <td><a id="HyperLink1" href="/api/v01/dataset/def.htm?search=*claimant*">/api/v01/dataset/def.htm?search=*claimant*</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for KeyFamilies containing the Keyword "Ethnic"</td>
+                                <td><a id="HyperLink24" href="/api/v01/dataset/def.htm?search=keywords-ethnic*">/api/v01/dataset/def.htm?search=keywords-ethnic*</a></td>
+                            </tr>
+                        </table>
+                    </div>
+        </div>
+        
+        <div class="discovery">
+            <h1>Discover Codelists and choose Codes</h1>
+                <p> The codelist uses an intelligent hierarchy to give you a top-down
+                    view of things like "Geography". Additional codes are introduced, not normally
+                    found in the complete codelist, that allow you to indicate that you want "all of a certain
+                    type within something else" - for example "all districts within the North East".</p>
+                    
+                <p> If you do not specify a date (the concept for date ranges is "time"), all will be selected.
+                    In order to make common date selections easier, we have reserved the following keywords:
+                    <ul>
+                        <li><b>"latest"</b> the latest available data for this dataset</li>
+                        <li><b>"previous"</b> the date prior to "latest"</li>
+                        <li><b>"prevyear"</b> the date one year prior to "latest"</li>
+                        <li><b>"first"</b> the oldest available data for this dataset</li>
+                    </ul>
+                 </p>
+                 <p>
+                    Using the "time" concept you are limited to entering two dates, a start and end. All dates between these are returned.
+                 </p>
+                 <p>
+                    <b>If however you require a specific list of dates, or to work with dates relative to the latest date you can use the
+                    "date" parameter instead of "time".</b> The "date" parameter is more flexible than using "time" and in future versions of the API
+                    it may replace the "time" parameter entirely.
+                 </p>
+                 
+                 <p>To illustrate the difference between using "date" and "time";
+                    if you specified "time=first,latest" in your URI you would get all dates from first to latest inclusive, whereas
+                    with "date=first,latest" your output would contain only the first and latest dates.
+                 </p>
+                 
+                 <p>  
+                    With the "date" parameter you can specify relative dates, so for example if you wanted the latest date, three months and six
+                    months prior to that you could specify "date=latest,latestMINUS3,latestMINUS6". You can use ranges with the "date"
+                    parameter, e.g. if you wanted data for 12 months ago, together with all dates in the last six month up to latest you could specify
+                    "date=prevyear,latestMINUS5-latest".
+                 </p>
+
+                <p> Metadata is available for some codes, if available, this is displayed as an annotation against that code.
+                    For the "time" concept, you will find metadata annotations about the date that the count was taken, or the exact
+                    date of the survey period as well as information on when data for that date is next scheduled to be revised.</p>
+                    
+                <p> If you need to know when a new date is going to be released, want to see the full revision history for a specific date,
+                    or view all detailed metadata held for any other concept you can download the metadata for that date or all dates as
+                    an XML or JSON file by appending ".metadata.xml" or ".metadata.json" (see examples below).</p>
+
+                <p> Whilst constructing your RESTful URI, after each Concept reference
+                    that you specify, you can obtain the Codelist for that concept. This saves you looking
+                    up the Codelist Id from the KeyFamily definition and formulating
+                    a URI to examine the Codelist. To do this, simply append ".def.sdmx.xml", ".def.sdmx.json" or ".def.htm"
+                    as in the examples below.</p>
+
+                <div class="example_xml">Example (XML):
+                        <table>
+                            <tr>
+                                <td>What top level areas are available?</td>
+                                <td><a id="HyperLink30" href="/api/v01/dataset/NM_1_1/geography.def.sdmx.xml">/api/v01/dataset/NM_1_1/geography.def.sdmx.xml</a></td>
+                            </tr>
+                            <tr>
+                                <td>What areas are within Darlington?</td>
+                                <td><a id="HyperLink20" href="/api/v01/dataset/NM_1_1/geography/2038432081.def.sdmx.xml">/api/v01/dataset/NM_1_1/geography/2038432081.def.sdmx.xml</a></td>
+                            </tr>
+                            <tr>
+                                <td>Partial codelist of the wards in Darlington</td>
+                                <td><a id="HyperLink17" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.xml">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.xml</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for wards ending with "central" in Darlington</td>
+                                <td><a id="HyperLink18" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.xml?search=*central">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.xml?search=*central</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available genders ("sex") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography</td>
+                                <td><a id="HyperLink38" href="/api/v01/dataset/NM_1_1/sex.def.sdmx.xml?geography=2038432081">/api/v01/dataset/NM_1_1/sex.def.sdmx.xml?geography=2038432081</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available items ("item") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography and sex</td>
+                                <td><a id="HyperLink39" href="/api/v01/dataset/NM_1_1/item.def.sdmx.xml?geography=2038432081&sex=7">/api/v01/dataset/NM_1_1/item.def.sdmx.xml?geography=2038432081&amp;sex=7</a></td>
+                            </tr>
+                            <tr>
+                                <td>Display metadata about the date January 2010</td>
+                                <td><a id="HyperLink45" href="/api/v01/dataset/NM_1_1/time/2010-01.metadata.xml">/api/v01/dataset/NM_1_1/time/2010-01.metdata.xml</a></td>
+                            </tr>
+                            <tr>
+                                <td>Display metadata about the all dates including dates that are yet to be released</td>
+                                <td><a id="HyperLink46" href="/api/v01/dataset/NM_1_1/time.metadata.xml">/api/v01/dataset/NM_1_1/time.metdata.xml</a></td>
+                            </tr>
+                        </table>
+                </div>
+                
+                <div class="example_json">Example (JSON):
+                        <table>
+                            <tr>
+                                <td>What top level areas are available?</td>
+                                <td><a id="HyperLink53" href="/api/v01/dataset/NM_1_1/geography.def.sdmx.json">/api/v01/dataset/NM_1_1/geography.def.sdmx.json</a></td>
+                            </tr>
+                            <tr>
+                                <td>What areas are within Darlington?</td>
+                                <td><a id="HyperLink54" href="/api/v01/dataset/NM_1_1/geography/2038432081.def.sdmx.json">/api/v01/dataset/NM_1_1/geography/2038432081.def.sdmx.json</a></td>
+                            </tr>
+                            <tr>
+                                <td>Partial codelist of the wards in Darlington</td>
+                                <td><a id="HyperLink55" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.json">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.json</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for wards ending with "central" in Darlington</td>
+                                <td><a id="HyperLink56" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.json?search=*central">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.sdmx.json?search=*central</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available genders ("sex") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography</td>
+                                <td><a id="HyperLink40" href="/api/v01/dataset/NM_1_1/sex.def.sdmx.json?geography=2038432081">/api/v01/dataset/NM_1_1/sex.def.sdmx.json?geography=2038432081</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available items ("item") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography and sex</td>
+                                <td><a id="HyperLink41" href="/api/v01/dataset/NM_1_1/item.def.sdmx.json?geography=2038432081&sex=7">/api/v01/dataset/NM_1_1/item.def.sdmx.json?geography=2038432081&sex=7</a></td>
+                            </tr>
+                            <tr>
+                                <td>Display metadata about the date January 2010</td>
+                                <td><a id="HyperLink47" href="/api/v01/dataset/NM_1_1/time/2010-01.metadata.json">/api/v01/dataset/NM_1_1/time/2010-01.metdata.json</a></td>
+                            </tr>
+                            <tr>
+                                <td>Display metadata about the all dates including dates that are yet to be released</td>
+                                <td><a id="HyperLink48" href="/api/v01/dataset/NM_1_1/time.metadata.json">/api/v01/dataset/NM_1_1/time.metdata.json</a></td>
+                            </tr>
+                        </table>
+                </div>
+                
+                 <div class="example_html">Example (HTML):
+                        <table>
+                            <tr>
+                                <td>What top level areas are available?</td>
+                                <td><a id="HyperLink34" href="/api/v01/dataset/NM_1_1/geography.def.htm">/api/v01/dataset/NM_1_1/geography.def.htm</a></td>
+                            </tr>
+                            <tr>
+                                <td>What areas are within Darlington?</td>
+                                <td><a id="HyperLink35" href="/api/v01/dataset/NM_1_1/geography/2038432081.def.htm">/api/v01/dataset/NM_1_1/geography/2038432081.def.htm</a></td>
+                            </tr>
+                            <tr>
+                                <td>Partial codelist of the wards in Darlington</td>
+                                <td><a id="HyperLink36" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.htm">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.htm</a></td>
+                            </tr>
+                            <tr>
+                                <td>Search for wards ending with "central" in Darlington</td>
+                                <td><a id="HyperLink37" href="/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.htm?search=*central">/api/v01/dataset/NM_1_1/geography/2038432081TYPE1.def.htm?search=*central</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available genders ("sex") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography</td>
+                                <td><a id="HyperLink42" href="/api/v01/dataset/NM_1_1/sex.def.htm?geography=2038432081">/api/v01/dataset/NM_1_1/sex.def.htm?geography=2038432081</a></td>
+                            </tr>
+                            <tr>
+                                <td>List all available items ("item") from the "Jobseeker's Allowance with Rates and Proportions" dataset after selecting geography and sex</td>
+                                <td><a id="HyperLink43" href="/api/v01/dataset/NM_1_1/item.def.htm?geography=2038432081&sex=7">/api/v01/dataset/NM_1_1/item.htm?geography=2038432081&sex=7</a></td>
+                            </tr>
+                        </table>
+                </div>
+        </div>
+        
+        <div class="discovery">
+            <h1>&quot;Contenttype&quot; support metadata and classifications</h1>
+            <p>There are many varying classifications, groupings and attributes of datasets that include things such as data sources, taxonomy etc.</p>
+            <p>We are working to add these to datasets where possible. When these are available, you will see them on dataset definitions as annotation tags (in XML or arrays in JSON).</p>
+            <p>The AnnotationTitle will begin &quot;contenttype/&quot; and finish with the type of content to which the entry relates. The AnnotationText details the id or ids in a comma delimited list if there is more than one allocated to this dataset for that content type.</p>
+            <p>For example in a dataset definition (def.sdmx.xml) a dataset source might appear as:<pre>
+  &lt;Annotation&gt;
+    &lt;AnnotationTitle&gt;contenttype/sources&lt;/AnnotationTitle&gt;
+    &lt;AnnotationText&gt;cc&lt;/AnnotationText&gt;
+  &lt;/Annotation&gt;
+</pre>
+            </p>
+            <p>To find out more about a contenttype (in either XML or JSON format) use the API. Your request is built up from the AnnotationTitle followed by the term "id" followed by the AnnotationText, for example from the above code you would find out more by requesting
+            &quot;/api/v01/contenttype/sources/id/cc.xml&quot; for the XML version or &quot;/api/v01/contenttype/sources/id/cc.json&quot; for the JSON version of the document. This returns a fragment of a contenttype document pertaining only to that specific id.</p>
+
+            <p>If you want to find out about the contenttype in general (for example to obtain the entire classification or taxonomy) specify only the AnnotationTitle part of the contenttype annotation. For example, &quot;/api/v01/contenttype/sources.xml&quot; for
+            the XML version or &quot;/api/v01/contenttype/sources.json&quot; for the JSON version. This returns the entire contenttype document, which will include a node for the specific id somewhere within it.</p>
+
+            <p>A list of available taxonomy, sources and classifications are published under <a id="HyperLink87" href="/api/v01/contenttype/index.xml">/api/v01/contenttype/index.xml</a> for the XML version or
+            <a id="HyperLink88" href="/api/v01/contenttype/index.json">/api/v01/contenttype/index.json</a> for the JSON version. When you find one that interests you, simply append the &quot;id&quot; and format required to
+            the contenttype URL to view the content. For example, an index entry that has an id of &quot;sources&quot; would be found at &quot;/api/v01/contenttype/sources.xml&quot;.</p>
+
+            <p>Once you have a contenttype (and optionally an individual item id), it is possible to find all related datasets. See the "search" section for how to specify search terms when discovering a list of available datasets.</p>
+        </div>
+
+        <div class="delivery">
+            <h1>Data download</h1>
+                <p> After the dataset ID (e.g. NM_1_1 for Jobseeker's Allowance with Rates and Proportions) you indicate
+                    that you want to download the data by specifying a format for the download.</p>
+
+                <p> Your selections are made in the query string (the part of the URI after the "?").
+                    For each of the "structure:Dimension" nodes in the KeyFamily you need to specify the "conceptRef"
+                    and the "structure:Code" value from the appropriate Codelist for that dimension in the form "conceptRef=code".</p>
+                    
+                <p> For any unspecified dimensions all available data will be downloaded, you can change this behaviour such that
+                    the default is selected rather than all for the omitted dimensions. To do this add the <i>setallwherenotspecified=false</i> parameter to your request.</p>
+                
+                <p> You can use the keyword "default" when you want the recommended codes for any given dimension (this is mostly equivalent to total),
+                    or "total" where you want no breakdown for a given dimension.</p>
+                    
+                  <div class="feature_html">
+                <h2>Multi-dimensional table output (HTML and Microsoft Excel XLSX/XLS)</h2>
+                <p>You can download data in HTML or Excel format by appending ".data.htm", ".data.xlsx" or ".data.xls" to your URI. This allows multi-dimensional tabulation.</p>
+                <p>You must specify the concepts that are to appear in the rows and columns. You can choose more than one (comma-separate the concepts) and this will result in those concepts being nested within each other. Any dimensions not specified will be presented in separated tables.</p>
+                <p>For example, assuming a dataset with geography, sex, ethnicity, occupation and age you might specify <i>rows=ethnicity,sex&cols=age,occupation</i>. This would result in a table of sex within ethnicity in the rows and occupation within age in the columns and a separate table for each geographic area.</p>
+                <p>For HTML, by default, the response from this query is a complete HTML page, but it is also possible to tune the output using the <i>select</i> argument. If any options are specified, then only parts of the response for those are returned. The available HTML options are:
+                <ul>
+                    <li><i>header</i>: Html tag, head tag, css style tag, body tag.</li>
+                    <li><i>items</i>: Descriptions at the top of each table for the dimensions that aren't in rows and columns.</li>
+                    <li><i>rowheadinglabels</i>: Labels for the names of dimensions that are included in rows.</li>
+                    <li><i>colheadinglabels</i>: Labels for the names of dimensions that are included in columns.</li>
+                    <li><i>colheadings</i>: Headings for the columns.</li>
+                    <li><i>data</i> or <i>datawithindent</i>: Figures (<i>datawithindent</i> option adds CSS class attributes to row labels to indicate indentation level in the form idt<i>n</i> where <i>n</i> is the zero based level).</li>
+                    <li><i>warnings</i>: Notes and warnings associated with the data.</li>
+                    <li><i>footer</i>: Closing body and html tags.</li>
+                    <li><i>usedisplaynames</i>: Label for row headings are shown in a shortened display friendly format which makes sense when used in context of all other codes in the codelist (particularly in combination with the <i>datawithindent</i> option.</li>
+                </ul>
+                </p>
+                <h2>Comma Separated Values or Tab Separated Values Download (csv/tsv)</h2>
+                    <p> To download your data as comma separated values (csv), at the end
+                        of your query path append ".data.csv". To download your data as tab separated values (tsv), at the end of your query path append ".data.tsv".</p>
+                    <p>You have a 25000 cell limit on the number of data values downloaded in these formats.</p>
+                    <p>
+                        These formats have columns describing each dimension and one value per row. They are good for high-speed bulk download
+                        and have many options for customising the output. At first glance this format seems verbose, but you can easily
+                        trim the output down to only the specific columns you require using the <i>Select</i> parameter. When first working on your URIs we suggest you
+                        use the <i>RecordLimit</i> parameter described below to get a feel for the output without triggering large downloads.
+                    </p>
+                    <p>
+                        If you are downloading a large amount of data and/or wish to reduce the size of download, you can
+                        restrict the columns included in the file and skip rows where the data value is missing (which is useful for sparse datasets).</p>
+                    <p> <b>Select columns to be output</b><br />
+                        To select columns, specify &quot;select=<i>DIMENSION1</i>,<i>DIMENSION2</i>,<i>DIMENSION3</i>&quot; in your URI. The order you specify the columns in is the order they will appear in your CSV file.
+                        There is a column heading for each dimension concept in your query (e.g. GEOGRAPHY, SEX etc.) and some additional columns; OBS_VALUE, OBS_STATUS, OBS_CONF, URN, RECORD_OFFSET and RECORD_COUNT.
+                        You can also get the actual names for the dimension values by appending &quot;_NAME&quot; to the concept (e.g. SEX_NAME) and their type by appending &quot;_TYPE&quot; to the concept (e.g. GEOGRAPHY_TYPE,
+                        which in this example will tell you that an area is a Ward or District etc.). This means you don't have to keep your own lookup lists for the Nomis codes.<br /><br />
+                        <i>Note: Dimensions also have a code column, where standard codes are shown if available (e.g. Geography has a column GEOGRAPHY_CODE showing the GSS code).</i></p>
+                    <p> <b>Exclude missing data values</b><br />To hide missing data values, append &quot;ExcludeMissingValues=true&quot; to your URI. To hide records containing a data value of zero, append &quot;ExcludeZeroValues=true&quot; to your URI.</p>
+                    <p> <b>Exclude Coumn Headings</b><br /> To exclude the column headings row, specify &quot;ExcludeColumnHeadings=true&quot; in your URI.</p>
+                    <p> <b>Query ID</b><br /> If you would like to identify the results as belonging to a particular query you have made, you can add a column called &quot;QUERY_ID&quot; to the results;
+                        the value of this column can contain any custom ID you require, the ID you specify is repeated in every row of the results. This is useful if you make multiple calls to the API using some automated process
+                        and need to work out which query the results belong to. To specify a custom Query ID, append the parameter &quot;&amp;queryid=<i>myref</i>&quot; to your URI (where myref is your own reference value).</p>
+                    <p> <b>Pagination (Record Limit and Offset)</b><br />
+                        You can limit the number of records returned from your query, and the record offset into the results to start from.
+                        This allows you to split your query into a series of smaller
+                        downloads or look at the first few records to see the column headings etc. without downloading the whole data file.
+                    <p> To set a record limit, append &quot;RecordLimit=<i>n</i>&quot; to your URI (where <i>n</i> is the number of rows and -1
+                        is used to mean all rows) if you do not specify a RecordLimit then it is assumed you want all records.</p>
+                    <p> To set the record offset, append &quot;RecordOffset=<i>n</i>&quot; to your URI (where <i>n</i> is the zero based offset into the results).
+                        If you go to a record beyond the end of the results only the column headings and no data will be returned.
+                        For offsets relative to the end of the results use a negative offset (e.g. &quot;RecordOffset=-25&quot; will give the last 25 records).</p>
+                    <p> The current row offset of any given row is found in the &quot;RECORD_OFFSET&quot; column in your output. To determine how many data records in your results, you can look at the &quot;RECORD_COUNT&quot; column for any row of data in your output.
+                        This is a count of the number of records, so is one more than the last RECORD_OFFSET (which is zero based).</p>
+                        
+                     
+                    <p><i>Note: RecordLimit and RecordOffset do not compensate for records that are removed when ExcludeMissingValues and/or ExcludeZeroValues is specified (i.e. records for missing values are always counted even if they are not included in your output file).</i></p>
+
+                    <div class="example">Example:
+                        <table cellpadding="5">
+                            <tr>
+                                <td>CSV file for a single area for all dates from Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink2" href="/api/v01/dataset/NM_1_1.data.csv?geography=2038432081&sex=5&item=1&measures=20100">/api/v01/dataset/NM_1_1.data.csv?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100</a></td>
+                            </tr>
+                             <tr>
+                                <td>TSV file for a single area for all dates from Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink86" href="/api/v01/dataset/NM_1_1.data.tsv?geography=2038432081&sex=5&item=1&measures=20100">/api/v01/dataset/NM_1_1.data.tsv?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink51" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset, selecting only the area code (GEOGRAPHY_CODE), item (ITEM_NAME) and value (OBS_VALUE) columns and excluding any missing values from the results</td>
+                                <td><a id="HyperLink50" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&measures=20100&time=latest&select=geography_code,item_name,obs_value&ExcludeMissingValues=true">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&amp;sex=7&amp;measures=20100&amp;time=latest&amp;select=geography_code,item_name,obs_value&amp;ExcludeMissingValues=true</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset, selecting only the first 5 rows</td>
+                                <td><a id="HyperLink68" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&item=1&measures=20100&time=latest&recordlimit=5">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&amp;item=1&amp;measures=20100&amp;time=latest&amp;recordlimit=5</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset, selecting 10 rows from row 20 onwards.</td>
+                                <td><a id="HyperLink69" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&item=1&measures=20100&time=latest&recordlimit=10&recordoffset=20">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest&amp;recordlimit=10&amp;recordoffset=20</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset, selecting no rows, so that we can see what column headings are available.</td>
+                                <td><a id="HyperLink70" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&item=1&measures=20100&time=latest&recordlimit=0">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest&amp;recordlimit=0</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSV file for all districts from Jobseeker's Allowance dataset, selecting the last 5 rows of data in the results.</td>
+                                <td><a id="HyperLink71" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&sex=7&item=1&measures=20100&time=latest&recordoffset=-5">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE486&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest&amp;recordoffset=-5</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <h3>Tabulating from one value per-row into grouped columns</h3>
+                    <p> This is an advanced feature that is similar to output that can be produced using Pivot Tables in Microsoft Excel against our standard download.</p>
+                    <p> To extract data in a format where more than one value is present on a row (e.g. by geography in the rows and gender repeated in the columns), you can specify the grouping using the "rows" and "cols" parameters.
+                    </p>
+                    <p> You have a 25000 cell limit on the number of data values for these tabulations.</p>
+                    <p> You can have multiple selections in the "rows" and "cols" parameters, the data will always be output sorted and grouped as required (see examples below). The rows and cols you specify form the basis for result ordering;
+                        numbers are sorted numerically and text is sorted alphabetically.
+                        For example, if you specify "sex" your results will be ordered by the sex code (e.g. 5, 6, 7; giving male, female then total), if you specify "sex_name" the results will be ordered by the actual sex name (e.g. Female, Male, Total).
+                        </p>
+                    <p> The column labels and their order are modified when tabulating:
+                        <ul>
+                          <li>When you group on one column and have selected only one data record column (e.g. OBS_VALUE); the column heading
+                              will be the actual code or name (e.g. "Male") and the column with the actual code or name will be automatically hidden.
+                          <li>When you group on one column and have selected multiple data record columns (e.g. OBS_VALUE,OBS_STATUS); the column heading
+                              will be the actual code or name followed by the record column description (e.g. "Male: OBS_VALUE"). The column containing the actual code or name will be automatically hidden.
+                          <li>When you group on multiple columns each of the things you designate as cols
+                              (together with their associated data columns), will be labelled with normal column descriptions
+                              prefixed with "GROUP <i>n</i>:" where <i>n</i> indicates the structural grouping level (e.g. 1, 1.1, 1.2 etc.).</p>
+                        </ul>
+                    <p> You can hide column headings completely by adding "ExcludeColumnHeadings=true" to your URI. You can also hide the outputs of items specified in the "rows" and "cols" by enclosing the names in brackets - e.g. "cols=(sex)".
+                        Data will still be sorted and grouped correctly, but as descriptive detail will be removed it may be hard to interpret the results
+                        correctly. You should only hide grouped columns where you know exactly which data you are extracting and the order it is being extracted in.</p>
+                    <p> Notes:
+                    <ul><li>Any columns in your pre-tabulated CSV (e.g. all possible columns, or anything in your filtered "select" parameter) that aren't in your "rows" and "cols" parameters and are not naturally associated with one of them
+                        (e.g. "sex,sex_name") will be output automatically at the bottom level of each distinct column group (i.e. you
+                        do not need to specify OBS_VALUE or OBS_STATUS in the "cols" parameter).
+                        <li>You can only tabulate on columns that are output, so if restricting columns using "select" parameter, make sure you add any tabulated columns to this list.
+                        <li>Columns associated with the "rows" and "cols" parameters are re-ordered, but any other columns maintain their original order (or the order specified in your "select" parameter).
+                        <li>You cannot exclude missing values when tabulating, if specified, the option will be ignored.
+                        <li>If you select associated columns (e.g. "sex,sex_name") in your output and group by the main column (e.g. "cols=sex")
+                        the associated columns will automatically be grouped with it and if hidden (e.g. with "cols=(sex)") then all will be hidden.
+                        <li>If you specify the "rows" parameter but do not specify "cols", your data will be sorted based on that specification. Your output will contain one value per row and column headings will not be modified.
+                        This can be a useful way to sort your data on multiple columns (see the final example below).</li>
+                        </ul>
+                     </p>
+                     <p>Warning:
+                        <ul>
+                        <li>You can use tabulation in conjunction with pagination, however, you must be careful to select ranges of records that are balanced in terms of the data they contain (i.e. don't start and stop mid-dimension).
+                            The results of tabulation performed with incorrectly balanced pagination is undefined, as column headings and calculations are based on the data from the first complete tabulated row.
+                        </ul></p>
+                    <div class="example">Example:
+                        <table cellpadding="5">
+                            <tr>
+                                <td>For reference, a standard CSV download</td>
+                                <td><a id="HyperLink77" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100&time=latest&select=geography_name,sex_name,obs_value">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography_name,sex_name,obs_value</a></td>
+                            </tr>
+                            <tr>
+                                <td>Tabulate the above CSV download so that geography is in rows and gender repeated in columns (sorted by name)</td>
+                                <td><a id="HyperLink78" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100&time=latest&select=geography_name,sex_name,obs_value&rows=geography_name&cols=sex_name">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography_name,sex_name,obs_value&amp;rows=geography_name&amp;cols=sex_name</a></td>
+                            </tr>
+                            <tr>
+                                <td>Tabulate the above CSV download so that geography is in rows and gender repeated in columns (sorted by code)</td>
+                                <td><a id="HyperLink82" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100&time=latest&select=geography_name,sex,sex_name,obs_value&rows=geography_name&cols=sex">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography_name,sex,sex_name,obs_value&amp;rows=geography_name&amp;cols=sex</a></td>
+                            </tr>
+                            <tr>
+                                <td>Tabulate the above CSV download so that geography is in rows (sorted by Nomis code) and gender repeated in columns (sorted by code)</td>
+                                <td><a id="HyperLink83" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100&time=latest&select=geography,geography_name,sex,sex_name,obs_value&rows=geography&cols=sex">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography,geography_name,sex,sex_name,obs_value&amp;rows=geography&amp;cols=sex</a></td>
+                            </tr>
+                            <tr>
+                                <td>Tabulate a CSV download containing two different types of geography, so that the rows are sorted by geography alphabetically within their type in rows and gender is repeated in columns</td>
+                                <td><a id="HyperLink84" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480,TYPE464&sex=5,6,7&item=1&measures=20100&time=latest&select=geography_type,geography_name,sex_name,obs_value&rows=geography_type,geography_name&cols=sex_name">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480,TYPE464&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography_type,geography_name,sex_name,obs_value&amp;rows=geography_type,geography_name&amp;cols=sex_name</a></td>
+                            </tr>
+                            <tr>
+                                <td>Query values and rates for latest data from Jobseeker's Allowance dataset and tabulate so that geography is within measures in rows and gender repeated in columns</td>
+                                <td><a id="HyperLink79" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100,20201&time=latest&select=measures_name,geography_name,sex_name,obs_value&rows=measures_name,geography_name&cols=sex_name">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100,20201&amp;time=latest&amp;select=measures_name,geography_name,sex_name,obs_value&amp;rows=measures_name,geography_name&amp;cols=sex_name</a></td>
+                            </tr>
+                            <tr>
+                                <td>Query values and rates for latest data from Jobseeker's Allowance dataset and tabulate so that geography is in the rows and measures within gender is repeated in columns</td>
+                                <td><a id="HyperLink80" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100,20201&select=measures_name,geography_name,sex_name,obs_value&rows=geography_name&cols=sex_name,measures_name">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100,20201&amp;select=measures_name,geography_name,sex_name,obs_value&amp;rows=geography_name&amp;cols=sex_name,measures_name</a></td>
+                            </tr>
+                            <tr>
+                                <td>Tabulate so that geography is in rows and gender repeated in columns, but this time, hide the descriptive columns for gender and exclude the heading row - you must be careful to understand the order of the results as the values are no longer fully described.</td>
+                                <td><a id="HyperLink81" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&sex=5,6,7&item=1&measures=20100,20201&select=geography,sex,obs_value&rows=geography&cols=(sex)&ExcludeColumnHeadings=true">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480&amp;sex=5,6,7&amp;item=1&amp;measures=20100,20201&amp;select=geography,sex,obs_value&amp;rows=geography&amp;cols=(sex)&amp;ExcludeColumnHeadings=true</a></td>
+                            </tr>
+                            <tr>
+                                <td>One value per row sorting on geography type then geography code then gender</td>
+                                <td><a id="HyperLink85" href="/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480,TYPE464&sex=5,6,7&item=1&measures=20100&time=latest&select=geography_type,geography_code,sex_name,obs_value&rows=geography_type,geography_code,sex_name">/api/v01/dataset/NM_1_1.data.csv?geography=TYPE480,TYPE464&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;select=geography_type,geography_code,sex_name,obs_value&amp;rows=geography_type,geography_code,sex_name</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+            </div>
+                <div class="feature_json">
+                    <h2>JSON-stat : JavaScript Object Notation (JSON) Download</h2>
+                        <p> JSON is a light-weight data interchange format that can be parsed and then addressed as a JavaScript object in your web browser.</p>
+                        <p>
+                            JSON-stat is a simple lightweight JSON dissemination format best suited for data visualization, mobile apps or open data initiatives, that has been designed for all kinds of disseminators.
+                            To download data in this format, append ".jsonstat.json" to your URI. You have a 25000 cell limit
+                            on the number of data values downloaded in this format. There are <a href=""http://json-stat.org/tools/"">JSON-stat Tools</a> available on the <a href=""http://json-stat.org"">JSON-stat</a> web site to make
+                            working with JSON-stat data files with JavaScript simple.</p>
+
+                        <p> Nomis also offers a proprietery format of JSON data file which is a JSON conversion based on an SDMX Compact Data XML document.
+                            Please note that this format may be removed in future versions of the Nomis API as it is verbose and slow compared with JSON-stat format.
+                            To use this format, append ".data.json" to your URI. The Nomis JSON data file contains an array named "obs" which has an element for each data observation. Each of
+                            these elements has a number of variables with names that match the dimension concepts and
+                            other attributes of the value (note: all JSON variables are lower case).</p>
+                            
+                        </div>
+
+                        <div class="example_json">Example (JSON):
+                            <table>
+                                <tr>
+                                    <td>JSON-stat data for a single value</td>
+                                    <td><a id="HyperLink65" href="/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1/jsonstat.json?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Simple demo application using AJAX to obtain JSON data</td>
+                                    <td><a href="http://www.nomisweb.co.uk/websvc/examples/ajax_json.htm">Simple AJAX demo application</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Demo showing data in charts and graphs</td>
+                                    <td><a href="http://www.nomisweb.co.uk/websvc/examples/dashboard.htm">Nomis API and Google Visualization</a></td>
+                                </tr>
+                            </table>
+                            
+                        </div>
+            </div>
+            
+            <div class="feature_json">
+                    <h2>Google Visualization Support (DataTable)</h2>
+                    <p>Google Visualization API uses a <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#DataTable">google.visualization.DataTable</a> class to hold data that is to be rendered in a chart, graph or table.</p>
+                    <p>The Nomis API can output data in a format that can be used to directly construct a Google DataTable making it very easy to produce charts, graphs and tables using Google Visualization API.
+                    To use this format, append "google.visualization.datatable.json" to your URI.</p>
+                    
+                    <p>Notes:
+                    <ul>
+                    <li>You have a 25000 cell limit on the number of data values for these tabulations.</li>
+                    <li>Use the "select", "rows" and "columns" options as detailed in the CSV download section of this document to shape the table into the correct format for your chart.</li>
+                    <li>Where you have more than one visualization that uses the same data but with different column ordering or only a sub-set of the records you have already retrieved from Nomis, there is a <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#DataView">google.visualization.DataView</a> available.
+                    The DataView allows you to filter and hide columns and rows from a DataTable, when you create a chart with a DataView only the filtered set of data is plotted.
+                    </li>
+                    </ul>
+                    </p>
+                    <div class="example_json">
+                    <table cellpadding="5">
+                            <tr>
+                                <td>Produce data for a Google DataTable of JSA proportions for all regions with male and female. Geography is in rows and gender is repeated in columns</td>
+                                <td><a id="HyperLink122" href="/api/v01/dataset/NM_1_1.google.visualization.datatable.json?geography=TYPE480&item=1&sex=5,6&measures=20201&time=latest&select=geography_name,sex_name,obs_value&rows=geography_name&cols=sex_name">/api/v01/dataset/NM_1_1.google.visualization.datatable.json?geography=TYPE480&amp;item=1&amp;sex=5,6&amp;measures=20201&amp;time=latest&amp;select=geography_name,sex_name,obs_value&amp;rows=geography_name&amp;cols=sex_name</a></td>
+                            </tr>
+                            <tr>
+                                <td>Example of the above API query used to produce a Google Bar Chart</td>
+                                <td><a href="http://www.nomisweb.co.uk/websvc/examples/regionbygenderchart.htm">Nomis API DataTable output and Google Bar Chart</a></td>
+                            </tr>
+                    </table>
+                    Below is an example visualization of a chart and table of data, put this in an HTML page to try it out.
+                    In this example we use <a href="http://jquery.com">jQuery</a> but you can get the JSON response using other methods:
+<pre>
+&lt;script type="text/javascript" src="https://www.nomisweb.co.uk/libs/jquery/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"&gt;&lt;/script&gt;
+
+&lt;script type="text/javascript"&gt;
+google.charts.load('current', { packages: ['table', 'corechart'] });
+google.setOnLoadCallback(displayData);
+
+function displayData()
+{
+	$.ajax({
+		url: 'http://www.nomisweb.co.uk/api/v01/dataset/NM_1_1.google.visualization.datatable.json',
+		data: 'geography=2092957697&amp;date=latestMINUS24-latest&amp;item=1&amp;measures=20201&amp;select=date,sex_name,obs_value&amp;rows=date&amp;scols=sex_name',
+		dataType: 'jsonp',
+		success: function(data)
+			{
+				// Create google DataTable from JSON data taken directly from the Nomis API.
+				var datatable = new google.visualization.DataTable(data);
+
+				var chart = new google.visualization.LineChart(document.getElementById('nomis_chart'));
+				chart.draw(datatable, {width: 800, height: 500, title: 'Nomis Data'});
+
+				var table = new google.visualization.Table(document.getElementById('nomis_table'));
+				table.draw(datatable, {showRowNumber: true});
+			}
+		});
+		
+	// You can repeat the above call with different API queries and different chart initializations
+	// here to produce as many different charts as you require on your page.
+}
+
+&lt;/script&gt;
+
+&lt;div id="nomis_chart"&gt;&lt;/div&gt;
+&lt;div id="nomis_table"&gt;&lt;/div&gt;
+
+</pre>
+</div>
+            </div>
+            
+            
+            <div class="feature_xml">
+                    <h2>Mapping using Keyhole Markup Language (KML) (experimental)</h2>
+                        <p> This format provides data for up to 1000 areas in KML format.
+                            It can be obtained by appending ".data.kml" to your URI. You have a 1000 cell limit
+                            on the number of data values downloaded in this format.</p>
+                        <p> Boundaries are only available for common areas (like regions, districts, wards, lower-level super output areas, Scottish datazones and output areas etc.).
+                        <p> Boundaries are shaded on an equal-interval key basis between minimum and maximum value in your results.
+                            When using this format, be sure to only request one value per area; i.e. only one of everything other than Geography.</p>
+                        <p> Boundaries are extruded by an altitude proportional to their value, relative to minimum and maximum values in your results. When plotted using Google Earth the altitude of the boundary is indicative of the
+                            value relative to the others in your results.</p>
+                        <p><i>Note: It is often best to compare rates where available, rather than absolute numbers.</i></p>
+                        <div class="example_xml">Example (KML):
+                            <table>
+                                <tr>
+                                    <td>KML demo applications using Google Maps and Nomis KML output</td>
+                                    <td>
+                                        <a id="HyperLink73" href="/websvc/examples/m.htm">2D Map</a><br />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>KML document for latest Jobseeker's Allowance rate for all wards in Durham district - try this URL in a search on Google Maps or add it as a &quot;network link&quot; in Google Earth.</td>
+                                    <td><a id="HyperLink72" href="/api/v01/dataset/NM_1_1.data.kml?geography=2038432083TYPE312&sex=7&item=1&measures=20203&time=latest">/api/v01/dataset/NM_1_1.data.kml?geography=2038432083TYPE312&amp;sex=7&amp;item=1&amp;measures=20203&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+            
+                <div class="feature_xml feature_json">
+                    <h2>SDMX GenericData Download</h2>
+                        <p> This format provides data in the SDMX GenericData document format. It can be obtained by appending ".generic.sdmx.xml" to
+                            your URI. You have a 25000 cell limit
+                            on the number of data values downloaded in this format (JSON has a a 25000 cell limit).</p>
+                        
+                        <div class="example_xml">Example (XML):
+                            <table>
+                                <tr>
+                                    <td>SDMX GenericData for a single value from Jobseeker's Allowance dataset</td>
+                                    <td><a id="HyperLink9" href="/api/v01/dataset/NM_1_1.generic.sdmx.xml?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.generic.sdmx.xml?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="example_json">Example (JSON):
+                            <table>
+                                <tr>
+                                    <td>SDMX GenericData for a single value from Jobseeker's Allowance dataset</td>
+                                    <td><a id="HyperLink58" href="/api/v01/dataset/NM_1_1.generic.sdmx.json?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.generic.sdmx.json?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+                
+                <div class="feature_xml feature_json">
+                    <h2>SDMX Structure Document</h2>
+                        <p> You can download all relevant parts of Codelists and
+                            Concepts together with the KeyFamily definition used by your query in one request.
+                            To do this, append ".structure.sdmx.xml" to your query path.</p>
+                            
+                        <p> Codelists can often be large (for example Geography), downloading this entire list
+                            of codes and names where you may only require one or two is very resource intensive.
+                            If you only require those parts of codelists that are relevant to understanding
+                            your SDMX GenericData document then you will find this output fast and useful.</p>
+
+                        <p> Using this SDMX Structure document in conjunction with
+                            your SDMX GenericData provides all the information you need to help present the
+                            results in a meaningful way.</p>
+
+                        <div class="example_xml">Example (XML):
+                            <table>
+                                <tr>
+                                    <td>SDMX Structure for a Jobseeker's Allowance query</td>
+                                    <td><a id="HyperLink21" href="/api/v01/dataset/NM_1_1.structure.sdmx.xml?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.structure.sdmx.xml?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="example_json">Example (JSON):
+                            <table>
+                                <tr>
+                                    <td>SDMX Structure for a Jobseeker's Allowance query</td>
+                                    <td><a id="HyperLink59" href="/api/v01/dataset/NM_1_1.structure.sdmx.json?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.structure.sdmx.json?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+                
+                <div class="feature_xml">
+                    <h2>SDMX CompactData Download</h2>
+                        <p> This format provides data in the SDMX CompactData document format.
+                            It can be obtained by appending ".compact.sdmx.xml" to
+                            your URI. You have a 25000 cell limit
+                            on the number of data values downloaded in this format.</p>
+
+                        <div class="example_xml">Example (XML):
+                            <table>
+                                <tr>
+                                    <td>SDMX CompactData for a single value Jobseeker's Allowance dataset</td>
+                                    <td><a id="HyperLink25" href="/api/v01/dataset/NM_1_1.compact.sdmx.xml?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.compact.sdmx.xml?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+                
+                <div class="feature_xml">
+                    <h2>SDMX Compact Schema</h2>
+                        <p> The compact schema describes the attributes and tags used in the compact data document.
+                            It can be obtained by appending ".compactschema.sdmx.xsd" to your URI.</p>
+                            
+                        <div class="example_xml">
+                            <table>
+                                <tr>
+                                    <td>SDMX Compact schema for the above query</td>
+                                    <td><a id="HyperLink26" href="/api/v01/dataset/NM_1_1.compactschema.sdmx.xsd?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.compactschema.sdmx.xsd?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+                
+                
+            
+           
+            
+            <div class="feature_html">
+                <h2>Microsoft Excel Spreadsheet Download (xls/xlsx)</h2>
+                    <p> To download your data as a Microsoft Excel spreadsheet, at the end of your
+                        query path append ".data.xlsx". To obtain older version of Excel use ".data.xls". You can change the name of the file that
+                        is downloaded by substituting "data.xls" with whatever name you would prefer (alphanumeric
+                        only, maximum 35 characters). You have a 25000 cell limit
+                        on the number of data values downloaded in this format. We automatically choose the layout that will produce the least number
+                        of tables but you can choose the concepts that go into the rows and columns using "rows=" and "cols=" (see example).</p>
+
+                    <div class="example">Example:
+                        <table>
+                            <tr>
+                                <td>Excel file for a single value from Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink10" href="/api/v01/dataset/NM_1_1.data.xls?geography=2038432081&sex=5&item=1&measures=20100&time=latest">/api/v01/dataset/NM_1_1.data.xls?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=latest</a></td>
+                            </tr>
+                            <tr>
+                                <td>Excel file for all sex values from Jobseeker's Allowance dataset (geography by sex layout)</td>
+                                <td><a id="HyperLink49" href="/api/v01/dataset/NM_1_1.data.xls?geography=2038432081&sex=5,6,7&item=1&measures=20100&time=latest&rows=geography&cols=sex">/api/v01/dataset/NM_1_1.data.xls?geography=2038432081&amp;sex=5,6,7&amp;item=1&amp;measures=20100&amp;time=latest&amp;rows=geography&amp;cols=sex</a></td>
+                            </tr>
+                        </table>
+                    </div>
+            </div>
+
+            <div class="feature_html feature_xml">
+                <h2>RSS Feed</h2>
+                    <p> You can use this to get the data formatted as an RSS Feed. When subscribed,
+                        your web browser or feed reader will notify you when the data for your URI has been updated.</p>
+                        
+                    <p> This is useful for being notified when new data has been released.</p>
+                    
+                    <p> To use this, append ".rss.xml" to the end of your query path. You have a 1000 cell limit
+                        on the number of data values downloaded in this format.</p>
+
+                    <p> The RSS Feed has an Item for every observation resulting from your query. The
+                        Title of the Item is generated by describing each of the codes in each part of the
+                        series key for the observation, together with the date and the data value.</p>
+                        
+                    <div class="example">Example:
+                        <table>
+                            <tr>
+                                <td>RSS feed of a single value from Jobseeker's Allowance dataset, in a time-series for the past year</td>
+                                <td><a id="HyperLink11" href="/api/v01/dataset/NM_1_1.rss.xml?geography=2038432081&sex=5&item=1&measures=20100&time=prevyear,latest">/api/v01/dataset/NM_1_1.rss.xml?geography=2038432081&amp;sex=5&amp;item=1&amp;measures=20100&amp;time=prevyear,latest</a></td>
+                            </tr>
+                        </table>
+                    </div>
+            </div>
+        </div>
+
+        <div class="delivery">
+            <h1>Specifying multiple Codes for per Concept</h1>
+                <p> Your choice of code values for a concept, must be placed after a "?" at the end of your URI, separated by a "," character.</p>
+                <p>
+                    You can also specify ranges.
+                    There are two types of range supported, the first (placing a "-" between two values) is used to select everything in the codelist between the first
+                    code in your range and the last code; the second (placing an ellipsis "..." between two values) is used to select all codes that are in the
+                    numeric range from the first code to the last.</p>
+                    
+                <div class="example_xml">Example (XML):
+                    <table>
+                        <tr>
+                            <td>SDMX GenericData for three values (male, female and total sex) from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink13" href="/api/v01/dataset/NM_1_1.generic.sdmx.xml?geography=2038432081&sex=5,6,7&time=latest&item=1&measures=20100">/api/v01/dataset/NM_1_1.generic.sdmx.xml?geography=2038432081&sex=5,6,7&amp;time=latest&amp;item=1&amp;measures=20100</a></td>
+                        </tr>
+                    </table>
+                </div>
+                 
+                <div class="example_json">Example (JSON-stat):
+                    <table>
+                        <tr>
+                            <td>JSON formatted data for three values (male, female and total sex) from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink60" href="/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&sex=5,6,7&time=latest&item=1&measures=20100">/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&amp;sex=5,6,7&amp;time=latest&amp;item=1&amp;measures=20100</a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="example_html">Example - Comma Separated Values (csv):
+                    <table>
+                        <tr>
+                            <td>CSV download for three values (male, female and total sex) from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink44" href="/api/v01/dataset/NM_1_1.data.csv?geography=2038432081&sex=5,6,7&time=latest&item=1&measures=20100">/api/v01/dataset/NM_1_1.data.csv?geography=2038432081&amp;sex=5,6,7&amp;time=latest&amp;item=1&amp;measures=20100</a></td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+
+        <div class="delivery">
+            <h1>Make your own User-Defined components</h1>
+            <p> You can combine the codes of some dimensions such as Age, Geography,
+                Occupation and Industry to create your own aggregate figure. This is an advanced
+                feature of the interface and the syntax for it is as follows:</p>
+                
+                <p><i>MAKE|name|code1;code2;code3...etc.</i></p>
+            
+                <div class="example">
+                    <table>
+                        <tr>
+                            <td>Create a User-Defined area that combined North East, North West and Yorkshire and the Humber together</td>
+                            <td>geography=MAKE|my area|2013265921;2013265922;2013265923</td>
+                        </tr>
+                        <tr>
+                            <td>Create a User-Defined area that combined North East, North West and Yorkshire and the Humber together (short version)</td>
+                            <td>geography=MAKE|my area|2013265921...2013265923</td>
+                        </tr>
+                        <tr>
+                            <td>Create a User-Defined age that combined ages under 25 together</td>
+                            <td>age=MAKE|Young|1;2;3;4;5;6</td>
+                        </tr>
+                        <tr>
+                            <td>Create a User-Defined age that combined ages under 25 together (short version)</td>
+                            <td>age=MAKE|Young|1...6</td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="delivery">
+            <h1>Lookup geography by Latitude and Longitude (experimental)</h1>
+            <p> The API can take a latitude and longitude point and convert this into a geographic area recognised by Nomis. You will need the Longitude and Latitude of your point and the Nomis type number of the area you want to locate.
+                This is an advanced feature of the interface and the syntax for it is as follows:</p>
+                
+                <p><i>LATLONG|latitude;longitude;type</i></p>
+               <p>You can also specify a further type instruction to the API, telling it to get all areas of a certain type within the type you have located. For example where you want to find a district from a latitude and longitude and display all the wards
+               within it.</p>
+               <p><i>LATLONG|latitude;longitude;type;typeswithin</i></p>
+                <div class="example">
+                    <table>
+                        <tr>
+                            <td>Clickable map demo application using Google Maps, KML from this API and the Latitude/Longitude lookup feature.</td>
+                            <td><a id="HyperLink75" href="/websvc/examples/mclick.htm">2D click-to-explore data map</a></td>
+                        </tr>
+                        <tr>
+                            <td>Look for the district (486) at a given latitude and longitude</td>
+                            <td>geography=LATLONG|53.612654;-2.4217;486</td>
+                        </tr>
+                        <tr>
+                            <td>Look for the 2003 CAS Ward (312) at a given latitude and longitude</td>
+                            <td>geography=LATLONG|53.612654;-2.4217;312</td>
+                        </tr>
+                        <tr>
+                            <td>Look for the 2003 CAS Wards (312) within the district (486) at a given latitude and longitude</td>
+                            <td>geography=LATLONG|53.612654;-2.4217;486;TYPE312</td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="delivery">
+            <h1>Lookup geography by Postcode</h1>
+            <p> The API can take a postcode and from it locate a geographic area recognised by Nomis. You will need the full or partial postcode and the Nomis type number of the area you want to locate.
+                This is an advanced feature of the interface and the syntax for it is as follows:</p>
+                
+                <p><i>POSTCODE|find;type</i></p>
+               <p>You can also specify a further type instruction to the API, telling it to get all areas of a certain type within the type you have located. For example where you want to find a district from a latitude and longitude and display all the wards
+               within it.</p>
+               <p><i>POSTCODE|find;type;typeswithin</i></p>
+               <p>Note: You can use a partial postcode (e.g. &quot;DH1&quot; or &quot;DH1 1&quot;) to find all the areas that are covered by that partial postcode match. Where more than one area is found, these will all be added to your query.</p>
+                <div class="example">
+                    <table>
+                        <tr>
+                            <td>Demo application using Google Maps, KML from this API and postcode lookup.</td>
+                            <td><a id="HyperLink76" href="/websvc/examples/mclick.htm">2D data map with postcode searching</a></td>
+                        </tr>
+                        <tr>
+                            <td>Look for the district (486) that contains DH1 3LE</td>
+                            <td>geography=POSTCODE|dh1 3le;486</td>
+                        </tr>
+                        <tr>
+                            <td>Look for the 2003 CAS Ward (312) that contains DH1 3LE</td>
+                            <td>geography=POSTCODE|dh1 3le;312</td>
+                        </tr>
+                        <tr>
+                            <td>Look for the 2003 CAS Wards (312) within the district (486) that contains DH1 3LE</td>
+                            <td>geography=POSTCODE|dh1 3le;486;TYPE312</td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="delivery discovery feature_json">
+            <h1>Cross-Origin Resource Sharing (CORS) and JSONP Callback</h1>
+                <h2>Cross-Origin Resource Sharing (CORS)</h2>
+                <p>This standard works by adding new HTTP headers that allow servers to describe the set of origins that are permitted to read that information using a web browser.
+                For more information on CORS, please see the <a href="http://www.w3.org/TR/cors/">W3C Cross-Origin Resource Sharing</a> working draft.
+                The Nomis API supports these headers both with and without pre-flight, allowing you to make cross-origin requests to our service from within your web browser JavaScript code.
+                CORS is supported in most recent web browsers through an <i>XMLHttpRequest</i> (or <i>XDomainRequest</i> in Internet Explorer).</p>
+            <p><b>CORS Example:</b></p>
+<pre>
+ &lt;html&gt;
+  &lt;body&gt;
+    &lt;p&gt;This page queries Nomis for some latest data from the Jobseeker's Allowance dataset.&lt;/p&gt;
+    &lt;p&gt;&lt;input type="button" onclick="getData();" value="Click to get data"&gt;&lt;/p&gt;
+    
+        &lt;script type="text/javascript"&gt;
+    //&lt;![CDATA[
+    
+    var req = new XMLHttpRequest();
+    
+    function getData(){
+        if(req)
+        {    
+            var url = 'http://www.nomisweb.co.uk/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest';
+            req.open('GET', url, true);
+            req.onreadystatechange = handler;
+            req.send(); 
+        }
+    }
+
+    function handler(evt)
+    {
+        if (req.readyState == 4)
+        {
+            if (req.status == 200)
+            {
+                var response = eval('(' + req.responseText + ')');
+                window.alert('Got data');
+            }
+            else window.alert('Error with call');
+        }
+    }
+    //]]&gt;
+    
+    &lt;/script&gt;
+  &lt;/body&gt;
+ &lt;/html&gt;
+</pre>
+            <h2>JSON with padding (JSONP)</h2>
+                <p>This is a complement to the JSON data format and an older alternative to using CORS. It allows you to request data from our server from a different domain.
+                When requesting JSON output, you may specify a callback function in your request by adding "&amp;callback=x" where x is the name of a function on your web page.
+                Our JSON response will be wrapped in this function call, causing your browser to call your callback function with the data as a parameter to that function.</p>
+            <p><b>JSONP Example:</b></p>
+<pre>
+ &lt;html&gt;
+  &lt;body&gt;
+    &lt;p&gt;This page queries Nomis for some latest data from the Jobseeker's Allowance dataset.&lt;/p&gt;
+    
+    &lt;script type="text/javascript"&gt;
+       function dataReady(data)
+       {
+          window.alert('Got callback');
+       }
+    &lt;/script&gt;
+    &lt;script src="http://www.nomisweb.co.uk/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&amp;sex=7&amp;item=1&amp;measures=20100&amp;time=latest&amp;callback=dataReady"&gt;&lt;/script&gt;
+  
+  &lt;/body&gt;
+ &lt;/html&gt;
+</pre>
+        </div>
+        
+        <div class="delivery discovery">
+            <h1>Prevent caching</h1>
+            <p> If you find your browser or application is caching API responses and you would like to ensure your URI is not cached, you
+                may append a random number or string to your URI using a parameter called either "random" or "_" (as used by jQuery).</p>
+            <p> Example:</p>
+<pre>
+   &lt;script type="text/javascript" src="http://www.nomisweb.co.uk/api/v01/dataset/NM_1_1.jsonstat.json?geography=2038432081&amp;sex=7&amp;time=latest&amp;item=1&amp;measures=20100&amp;callback=dataReady&amp;random=24127718"&gt;
+</pre>
+        </div>
+        
+        <div class="delivery">
+            <h1>Linking to an individual cell of data by URN</h1>
+            <p> The API can directly address any individual cell of data held in the Nomis database using its unique URN.</p>
+            <p> To find the URN of a value, download data from the API as part of a normal API call and you will notice each observation has a &quot;urn&quot; attribute attached to it; use this to retreive that individual cell.</p>
+                
+                <div class="example_xml">Example (XML):
+                    <table>
+                        <tr>
+                            <td>SDMX GenericData for a single cell from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink57" href="/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.generic.sdmx.xml">/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.generic.sdmx.xml</a></td>
+                        </tr>
+                        <tr>
+                            <td>SDMX Structure Document for a single cell from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink67" href="/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.structure.sdmx.xml">/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.structure.sdmx.xml</a></td>
+                        </tr>
+                    </table>
+                </div>
+                 
+                <div class="example_json">Example (JSON):
+                    <table>
+                        <tr>
+                            <td>JSON formatted data for a single cell from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink64" href="/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.json">/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.json</a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="example_html">Example - Comma Separated Values (csv):
+                    <table>
+                        <tr>
+                            <td>CSV formatted data for a single cell from the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink66" href="/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.csv">/api/v01/datastore/Nm-1d1d32179e1d2038432081d5d1d20100.csv</a></td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="discovery">
+            <h1>Codelists</h1>
+                <p> A Codelist contains a simple list of all code values, together with their names.
+                    These lists are important because they tell you what you can specify for a particular
+                    Dimension of a KeyFamily and also allow you to work out from your GenericData results
+                    (via the KeyFamily document) what the observations actually relate to.</p>
+                    
+                <h2>Complete list of Codes</h2>
+                    <p> To obtain a specific Codelist all you need to know is the "id", you obtain this
+                        by looking at the KeyFamily document. Each "structure:Dimension" node in the KeyFamily
+                        document has a "codelist" attribute. The value of this attribute is the "id" for
+                        the Codelist of valid selectable codes for that dimension. A codelist "id" will
+                        usually begin with the letters "CL_".</p>
+                        
+                    <p> Be aware that some Codelists can be very large - particularly Geography.</p>
+                    
+                    <div class="example_xml">Example (XML):
+                        <table>
+                            <tr>
+                                <td>Item codelist used by the Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink7" href="/api/v01/codelist/CL_1_1_ITEM.def.sdmx.xml">/api/v01/codelist/CL_1_1_ITEM.def.sdmx.xml</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="example_json">Example (JSON):
+                        <table>
+                            <tr>
+                                <td>Item codelist used by the Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink61" href="/api/v01/codelist/CL_1_1_ITEM.def.sdmx.json">/api/v01/codelist/CL_1_1_ITEM.def.sdmx.json</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="example_html">Example (HTML):
+                        <table>
+                            <tr>
+                                <td>Item codelist used by the Jobseeker's Allowance dataset</td>
+                                <td><a id="HyperLink28" href="/api/v01/codelist/CL_1_1_ITEM.def.htm">/api/v01/codelist/CL_1_1_ITEM.def.htm</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                        
+                <h2>Partial Codelists</h2>
+                    <p> SDMX does not formally support partial codelists, but you can use our API to retrieve a partial codelist should
+                        you only need the codes and names for part of a larger list:<br />
+
+                        <h3>Single code</h3>
+                            <p> To obtain a partial codelist you need to know the Codelist Id and value of the code you require.</p>
+                            <div class="example_xml">Example (XML):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of geography containing only "North East"</td>
+                                        <td><a id="HyperLink14" href="/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.sdmx.xml">/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.sdmx.xml</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="example_json">Example (JSON):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of geography containing only "North East"</td>
+                                        <td><a id="HyperLink62" href="/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.sdmx.json">/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.sdmx.json</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="example_html">Example (HTML):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of geography containing only "North East"</td>
+                                        <td><a id="HyperLink4" href="/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.htm">/api/v01/codelist/CL_1_1_GEOGRAPHY/2013265921.def.htm</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        <h3>Search for a Code</h3>
+                            <p> To search for codes where the name contains a given string, append "search=term" to your URI. Wildcard character is "*" and match is not case sensitive.</p>
+
+                            <div class="example_xml">Example (XML):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of areas ending with "Midlands"</td>
+                                        <td><a id="HyperLink15" href="/api/v01/codelist/CL_27_1_GEOGRAPHY.def.sdmx.xml?search=*midlands">/api/v01/codelist/CL_27_1_GEOGRAPHY.def.sdmx.xml?search=*midlands</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="example_json">Example (JSON):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of areas ending with "Midlands"</td>
+                                        <td><a id="HyperLink63" href="/api/v01/codelist/CL_27_1_GEOGRAPHY.def.sdmx.json?search=*midlands">/api/v01/codelist/CL_27_1_GEOGRAPHY.def.sdmx.json?search=*midlands</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="example_html">Example (HTML):
+                                <table>
+                                    <tr>
+                                        <td>Partial Codelist of areas ending with "Midlands"</td>
+                                        <td><a id="HyperLink3" href="/api/v01/codelist/CL_27_1_GEOGRAPHY.def.htm?search=*midlands">/api/v01/codelist/CL_27_1_GEOGRAPHY.def.htm?search=*midlands</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+        </div>
+        
+        <div class="discovery">
+            <h1>Concepts</h1>
+                <p> A concept provides you with the name of the "thing" that the dimension
+                    relates to, if you were writing a user interface to the data, you would typically
+                    want to give the name of the concept, followed by a selection of codes from the
+                    appropriate codelist.</p>
+                    
+                <p> To obtain a specific Concept all you need to know is its "id", you obtain this by
+                    looking at the KeyFamily document. Each "structure:Dimension" node in the KeyFamily
+                    document has a "conceptRef" attribute. The value of this attribute is the "id" for
+                    the Concept.</p>
+                    
+                <div class="example_xml">Example (XML):
+                    <table>
+                        <tr>
+                            <td>Item concept used by the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink8" href="/api/v01/concept/ITEM.def.sdmx.xml">/api/v01/concept/ITEM.def.sdmx.xml</a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="example_json">Example (JSON):
+                    <table>
+                        <tr>
+                            <td>Item concept used by the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink19" href="/api/v01/concept/ITEM.def.sdmx.json">/api/v01/concept/ITEM.def.sdmx.json</a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="example_html">Example (HTML):
+                    <table>
+                        <tr>
+                            <td>Item concept used by the Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink27" href="/api/v01/concept/ITEM.def.htm">/api/v01/concept/ITEM.def.htm</a></td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="discovery">
+            <h1>Dataset Overview</h1>
+                <p> A good way to get an overview of a dataset, its dimensions, codes and metadata is using the "overview" document, this format is specific to Nomis (not SDMX) and is available as either an XML or JSON document.</p>
+                
+                <p> By default, all information available for a dataset is returned, but if you only require certain parts of the overview, you can use the "select" parameter to specify exactly which parts of the overview you are interested in.
+                    When you specify a select clause, then only the parts specified will be returned. Available terms are as follows (you can use multiple in a single request, separated by ","):</p>
+                <ul>
+                    <li>DatasetInfo - General dataset information such as name, description, sub-description, mnemonic, restricted access and status</li>
+                    <li>Coverage - Shows the geographic coverage of the main geography dimension in this dataset (e.g. United Kingdom, England and Wales etc.)</li>
+                    <li>Keywords - The keywords allocated to the dataset</li>
+                    <li>Units - The units of measure supported by the dataset</li>
+                    <li>ContentTypes - The classifications allocated to this dataset</li>
+                    <li>DateMetadata - Information about the first release, last update and next update</li>
+                    <li>Contact - Details for the point of contact for this dataset</li>
+                    <li>Analyses - Show the available analysis breakdowns of this dataset</li>
+                    <li>Dimensions - Individual dimension information (e.g. sex, geography, date, etc.)</li>
+                    <li>Dimension-<i>concept</i> - Allows a specific dimension to be selected (e.g. dimension-geography would allow information about geography dimension). This is not used if "Dimensions" is specified too.</li>
+                    <li>Codes - Full list of selectable codes, excluding Geography, which as a list of Types instead. (Requires "Dimensions" to be selected too)</li>
+                    <li>Codes-<i>concept</i> - Full list of selectable codes for a specific dimension, excluding Geography, which as a list of Types instead. This is not used if "Codes" is specified too (Requires "Dimensions" or equivalent to be selected too)</li>
+                    <li>DimensionMetadata - Any available metadata attached at the dimensional level (Requires "Dimensions" or equivalent to be selected too)</li>
+                    <li>Make - Information about whether user defined codes can be created with the MAKE parameter when querying data (Requires "Dimensions" or equivalent to be selected too)</li>
+                    <li>DatasetMetadata - Metadata attached at the dataset level</li>
+                </ul>
+                <div class="example_xml">Example (XML):
+                    <table>
+                        <tr>
+                            <td>Overview for Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink8881" href="/api/v01/dataset/nm_1_1.overview.xml">/api/v01/dataset/nm_1_1.overview.xml</a></td>
+                            </tr>
+                        <tr>
+                            <td>Overview for Jobseeker's Allowance dataset with view restricted to mainly metadata</td>
+                            <td><a id="HyperLink8191" href="/api/v01/dataset/nm_1_1.overview.xml?select=DateMetadata,DatasetMetadata,Dimensions,DimensionMetadata">/api/v01/dataset/nm_1_1.overview.xml?select=DateMetadata,DatasetMetadata,Dimensions,DimensionMetadata</a></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="example_json">Example (JSON):
+                    <table>
+                        <tr>
+                            <td>Overview for Jobseeker's Allowance dataset</td>
+                            <td><a id="HyperLink888" href="/api/v01/dataset/nm_1_1.overview.json">/api/v01/dataset/nm_1_1.overview.json</a></td>
+                        </tr>
+                        <tr>
+                            <td>Overview for Jobseeker's Allowance dataset with view restricted to mainly metadata</td>
+                            <td><a id="HyperLink819" href="/api/v01/dataset/nm_1_1.overview.json?select=DateMetadata,DatasetMetadata,Dimensions,DimensionMetadata">/api/v01/dataset/nm_1_1.overview.json?select=DateMetadata,DatasetMetadata,Dimensions,DimensionMetadata</a></td>
+                        </tr>
+                    </table>
+                </div>
+        </div>
+
+        <div class="perma">
+            <h1>API Key, your Unique ID and Signatures</h1>
+                <p> Use of the API key is optional. If you do not use an API key, then you will be an anonymous "guest" user,
+                    the size of download will be limited to 25,000 cells.</p>
+                    
+                <p> To use the API anonymously, simply don't specify a Unique ID or Signature in your request.</p>
+                
+                <p> To use the API without cell limits, you need to specify either your Unique ID for server-side calls
+                    (treat your Unique ID like a password, never pass it on to third parties) or your
+                    Signature for publically viewable URIs when you first create your RESTful URI.</p>
+                
+                <p> To use your Unique ID, append it using "?uid=0x..............." on your URI, alternatively
+                    in links that you intend to make publically viewable, specify your signature in
+                    the form "?signature=.......". For more information about your Unique ID or creating a signature from your public
+                    and private keys, sign in on the Nomis homepage, click "my account" then "web services".</p>
+        </div>
+
+        <div class="perma">
+            <h1>Error handling</h1>
+                <p> If there is an error with the way your URI is formed, or Nomis is suffering internal server issues you may encounter an
+                    error.</p>
+
+                <p> When an error occurs:
+                    <ul>
+                        <li>Response HTTP Status Code will be set to 500 (internal server error)</li>
+                        <li>Response body will contain information about the error (format will match that of requested page where possible - e.g. XML, JSON etc.)</li>
+                    </ul>
+                    </p>
+                <p>Example error messages:</p>
+                <p><b>JSON</b>
+    <pre>
+    { "error" : "Unable to contact data engine" }
+    </pre>
+    </p>
+    <p><b>XML</b>
+    <pre>
+    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;Error&gt;Unable to contact data engine&lt;/Error&gt;
+    </pre>
+     </p>
+     <p><b>Plain text (CSV etc.)</b>
+    <pre>
+    Error: Unable to contact data engine
+    </pre>
+    </p>
+        </div>
+
+    <script type="text/javascript">
+    function setDiscoveryOnly()
+    {
+        setDisplay('delivery', false);
+        setDisplay('discovery', true);
+    }
+    
+    function setDeliveryOnly()
+    {
+        setDisplay('discovery', false);
+        setDisplay('delivery', true);
+    }
+    
+    function setDeliveryAndDiscovery()
+    {
+        setDisplay('discovery', true);
+        setDisplay('delivery', true);
+    }
+    
+    function setAny()
+    {
+        setDisplay('simple', true);
+        setDisplay('example_html', true);
+        setDisplay('feature_html', true);
+        setDisplay('example_xml', true);
+        setDisplay('feature_xml', true);
+        setDisplay('example_json', true);
+        setDisplay('feature_json', true);
+    }
+    
+    function setNoKnow()
+    {
+        setDisplay('example_xml', false);
+        setDisplay('feature_xml', false);
+        setDisplay('example_json', false);
+        setDisplay('feature_json', false);
+        setDisplay('simple', true);
+        setDisplay('example_html', true);
+        setDisplay('feature_html', true);
+    }
+    
+    function setXMLOnly()
+    {
+        setDisplay('simple', false);
+        setDisplay('example_html', false);
+        setDisplay('feature_html', false);
+        setDisplay('example_json', false);
+        setDisplay('feature_json', false);
+        setDisplay('example_xml', true);
+        setDisplay('feature_xml', true);
+    }
+    
+    function setJSONOnly()
+    {
+        setDisplay('simple', false);
+        setDisplay('example_html', false);
+        setDisplay('feature_html', false);
+        setDisplay('example_xml', false);
+        setDisplay('feature_xml', false);
+        setDisplay('example_json', true);
+        setDisplay('feature_json', true);
+    }
+    </script>
+    </form>
+<script language="javascript" type="text/javascript">
+  SetBreadCrumbs(new Array('/api','Nomis API'));
+</script>    </div>
+	<!-- Begin footer -->
+    <footer style="clear:both;">
+    <div id="nomis-footer-wrapper" role="contentinfo">
+		<ul>
+            <li><a href="/api">API</a></li>
+            <li><a href="/home/sitemap.asp" accesskey="3" id="Site-map">Site map</a></li>
+            <li><a href="/home/news.asp" id="News">News</a></li>
+            <li><a href="/home/accessibility.asp">Accessibility</a></li>
+            <li><a href="/home/accesskeys.asp" id="access-keys" accesskey="0">Access keys</a></li>
+            <li><a href="/home/privacy.asp" id="Privacy-and-Cookies">Privacy and Cookies</a></li>
+            <li><a href="/home/terms.asp" id="Terms-and-Conditions" accesskey="8">Terms and Conditions</a></li>
+			<li><a href="/home/copyright.asp" id="Crown-Copyright">&copy; Crown Copyright</a></li>
+		</ul>
+
+        
+        <div id="durham-uni-logo-container">
+            <a href="http://www.dur.ac.uk"><img border="0" src="/images/du_logo.png" alt="Durham University Logo" /></a>
+        </div>
+    </div>
+
+    </footer>
+	<!-- End footer -->
+
+    <!-- Begin Site-wide Information Popup Box -->
+        <div id="modalBack" role="alert" aria-labelledby="modalDivTitle" style="display: none;">
+            <div id="modalDiv" tabindex="-1">
+                <div id="modalDivHead">
+                     <h2 id="modalDivTitle"></h2>
+	                <div id="modalDivTools"><input type="button" title="Close this pop-up (esc)" id="modalCloseButton" value="Close" onclick="modalClose();" class="modalDivTool" /></div>
+                </div>
+	            <div id="modalBusy"><p>Please wait...</p></div>
+	            <div id="modalDivBody"></div>
+            </div>
+        </div>
+        <!-- End Site-wide Information Popup Box -->
+        <!-- PRE-END-NOMISWEB-PAGE-DIV-HOOK -->
+    </div>
+    
+    <script type="text/javascript" src="/js/tips.js"></script>
+    <!-- End Nomisweb Page div -->
+  </body>
+</html>

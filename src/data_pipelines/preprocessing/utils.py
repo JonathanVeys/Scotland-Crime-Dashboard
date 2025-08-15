@@ -16,6 +16,7 @@ def normalise_text(string: str) -> str:
     string = re.sub('&', '', string)
     string = re.sub('/', '', string)
     string = re.sub(',', '', string)
+    string = re.sub('.', '', string)
     string = re.sub("'", '', string)
     string = re.sub(r"\s+", '', string)
     string = re.sub('agus', '', string)
@@ -26,6 +27,13 @@ def normalise_text(string: str) -> str:
 
     return string
 
+def normalise_column_name(col_name:str) -> str:
+    col_name = col_name.lower()
+    col_name = re.sub('(?<=\w) (?=\w)', '_', col_name)
+    col_name = re.sub('\((.*?)\)', '', col_name)
+    col_name = re.sub(' ', '', col_name)
+
+    return col_name
 
 def subset_columns(data:pd.DataFrame, columns_to_keep:List[str]):
     '''

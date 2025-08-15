@@ -1,9 +1,16 @@
+import os
+
 import pandas as pd
 import geopandas as gpd
+from dotenv import load_dotenv      
+import pandera.pandas as pa
 
-from scraping.crime_scrapper import get_crime_data_url, crime_data_scrapper
-from preprocessing.utils import normalise_text, subset_columns, rename_column_names, split_dataset
-from preprocessing.spacial_processing import load_and_filter_wards, calculate_overlap, prepare_wards
+from src.data_pipelines.scraping.crime_scrapper import get_crime_data_url, crime_data_scrapper
+from src.data_pipelines.preprocessing.utils import normalise_text, subset_columns, rename_column_names, split_dataset
+from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, prepare_wards
+from src.data_pipelines.DB.update_database import update_db
+
+from tests.test_crime_pipeline import test_columns_exist, test_NA, test_schema
 
 
 if __name__ == '__main__':
@@ -32,11 +39,6 @@ if __name__ == '__main__':
 
     crime_urls = get_crime_data_url(base_url, page_url)
     crime_data = crime_data_scrapper(crime_urls)
-
-    # for key in crime_data.keys():
-    #     df = crime_data[key]
-    #     df = crime_data_processing(df)
-    #     crime_data[key] = df
 
     ward_code_name_lookup = pd.read_csv('/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/ward_names_lookup.csv', encoding='latin1')
     ward_code_name_lookup = ward_code_name_lookup[['MMWard_Code', 'MMWard_Name', 'LA_Name']].drop_duplicates().reset_index(drop=True)
@@ -118,11 +120,43 @@ if __name__ == '__main__':
         df = pd.concat([hebredies_crime_data, rest_scotland_crime_data])
 
         df = df.merge(ward_code_name_lookup, on='ward_name_normalised', how='left')
+        df = df.drop(['ward_name_normalised', 'MMWard_Name', 'LA_Name'], axis=1)
 
-        # print(df)
+        crime_data[key] = df
+    
+    crime_data = pd.concat(crime_data, ignore_index=True).sort_values(['year', 'month', 'ward_name'])
 
-        missing_codes = df[['ward_name', 'council_name', 'ward_name_normalised', 'MMWard_Name', 'MMWard_Code']]
-        missing_codes = missing_codes[pd.isna(missing_codes['MMWard_Code'])].drop_duplicates().reset_index(drop=True)
-        print(missing_codes)
+    df_schema = pa.DataFrameSchema(
+        {
+            'ward_name':pa.Column(str),
+            'council_name':pa.Column(str),
+            'year':pa.Column(pa.Int64),
+            'month':pa.Column(pa.Int64),
+            'crime_group':pa.Column(pa.Int64),
+            'group_description':pa.Column(str),
+            'crime_count':pa.Column(pa.Int64),
+            'MMWard_Code':pa.Column(str)
+        }
+    )
 
+    test_columns_exist(crime_data, ['ward_name', 'council_name', 'year', 'month', 'crime_group', 'group_description', 'crime_count', 'MMWard_Code'])
+    test_NA(crime_data, ['ward_name', 'council_name', 'year', 'month', 'crime_group', 'group_description', 'crime_count', 'MMWard_Code'])
+    test_schema(crime_data, df_schema)
+
+    load_dotenv()
+    DB_URL = os.getenv("SUPABASE_DB_URL")
+
+    required_columns = [
+        'ward_name',
+        'council_name',
+        'year',
+        'month',
+        'crime_group',
+        'group_description',
+        'crime_count',
+        'MMWard_Code'
+    ]
+
+    if DB_URL is not None:
+        update_db(data=df, db_url=DB_URL, table_name='ward_crime', required_columns=required_columns)
         
