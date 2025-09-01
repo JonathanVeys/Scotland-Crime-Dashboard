@@ -22,7 +22,7 @@ def update_db(data:pd.DataFrame, db_url:str, table_name:str, required_columns:li
     
     try: 
         data.to_sql(table_name, engine, if_exists='replace', index=False)
-        print("Successfully updated database values")
+        print("✅Successfully updated database values")
 
     except Exception as ex:
         print(f"Error: Update failed due to: {ex}")
