@@ -4,7 +4,7 @@ import pandas as pd
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
 from src.data_pipelines.preprocessing.utils import normalise_text, rename_column_names, subset_columns
-from src.data_pipelines.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007
+from src.data_pipelines.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007, MANNUAL_WARD_NAME_EDITS_2022
 
 
 class EmploymentPipeline:
@@ -104,13 +104,21 @@ class EmploymentPipeline:
         
 
     
-COLUMN_RENAME_DICT = {
+COLUMN_RENAME_DICT_2007 = {
             'Electoral Ward 2007':'ward_name_2007',
             'All people aged 16 to 74':'total_pop',
             'Economically inactive: Looking after home or family':'caring_for_family',
             'Economically inactive: Long-term sick or disabled':'long_term_sick_or_disabled',
             'Unemployed people aged 16 to 74: Aged 16 to 24':'young_unemployed'
     }
+
+COLUMN_RENAME_DICT_2022 = {
+    'Economic activity - 20 groups, all':'ward_name_2022',
+    'All people aged 16 and over':'total_pop',
+    'Economically inactive - Looking after home/ family':'caring_for_family',
+    'Economically inactive - Long term sick or disabled':'long_term_sick_or_disabled',
+
+}
 
 def main():
     ward_boundaries_2007_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/4th_Review_2007_2017_All_Scotland_wards/All_Scotland_wards_4th.shp'
@@ -126,10 +134,10 @@ def main():
     ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
 
     employment_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2011.csv'
-    employment_data = EmploymentPipeline(employment_2011_path, 'Electoral Ward 2007')
-    employment_data = (
-        employment_data.load_data(skiprows=12, skipfooter=5)
-        .rename_cols(COLUMN_RENAME_DICT)
+    employment_data_2011 = EmploymentPipeline(employment_2011_path, 'Electoral Ward 2007')
+    employment_data_2011 = (
+        employment_data_2011.load_data(skiprows=12, skipfooter=5)
+        .rename_cols(COLUMN_RENAME_DICT_2007)
         .sum_cols('employed_adults', ['Economically active: Employee: Full-time', 'Economically active: Self-employed', 'Economically active: Unemployed'])
         .divide_cols(new_col_name='caring_for_family_pct', col_numerator_name='caring_for_family', col_denominator_name='total_pop')
         .divide_cols(new_col_name='long_term_sick_or_disabled_pct', col_numerator_name='long_term_sick_or_disabled', col_denominator_name='total_pop')
@@ -142,7 +150,25 @@ def main():
         .drop_columns('ward_name_2007')
     )
     
-    print(employment_data.data)
+    employment_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2022.csv'
+    employment_data_2022 = EmploymentPipeline(employment_2022_path, '')
+    employment_data_2022 = (
+        employment_data_2022.load_data(skiprows=8, skipfooter=5)
+        .rename_cols(COLUMN_RENAME_DICT_2022)
+        .sum_cols('employed_adults', ['Economically Active (excluding full-time students) - Employee - Total', 'Economically Active (excluding full-time students) - Self-employed with employees - Total', 'Economically Active (excluding full-time students) - Self-employed without employees - Total'])
+        .sum_cols('unemployed_adults', ['Economically Active (excluding full-time students) - Unemployed - Available for work', 'Economically Active full-time students - Unemployed - Available for work'])
+        .divide_cols(new_col_name='caring_for_family_pct', col_numerator_name='caring_for_family', col_denominator_name='total_pop')
+        .divide_cols(new_col_name='long_term_sick_or_disabled_pct', col_numerator_name='long_term_sick_or_disabled', col_denominator_name='total_pop')
+        .divide_cols(new_col_name='unemployment_pct', col_numerator_name='unemployed_adults', col_denominator_name='employed_adults')
+        .subset_columns(['ward_name_2022', 'caring_for_family_pct', 'long_term_sick_or_disabled_pct', 'unemployment_pct'])
+        .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2022')
+        .apply_mannual_edits('ward_name_2022', MANNUAL_WARD_NAME_EDITS_2022)
+        .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
+        .drop_columns('ward_name_2022')
+
+    )
+    
+ 
 
 
 def main2():

@@ -6,10 +6,10 @@ NAME_DISAMBIGUATION_2007 = {
 }
 
 NAME_DISAMBIGUATION_2022 = {
-    'S13002737':'northislesorkney',
-    'S13002772':'northislesshetland',
-    'S13002830':'norhteastdundeecity',
-    'S13003133':'northeastglasgow'
+    'S13002737':'northislesorkneyislands',
+    'S13002772':'northislesshetlandislands',
+    'S13002830':'northeastdundeecity',
+    'S13003133':'northeastglasgowcity'
 }
 
 MANNUAL_WARD_NAME_EDITS_2007 = {
@@ -19,4 +19,14 @@ MANNUAL_WARD_NAME_EDITS_2007 = {
         'landcaithness':'landwardcaithness',
         'invernessmillburn':'invernessmilburn',
         'monifiethsidlaw':'monifeithsidlaw'
+    }
+
+MANNUAL_WARD_NAME_EDITS_2022 = {
+        'eileanacheo':'eileanacha o',
+        'sgiruigecarlabhagh':'sgaraigecarlabhagh',
+        'sgireanrubha':'sgareanrubha',
+        'sgirenanloch':'sgarenanloch',
+        'steornabhaghadeas':'stea2rnabhaghadeas',
+        'steornabhaghatuath':'stea2rnabhaghatuath',
+        'uibhistadeaseirisgeighbeinnnafaoghla':'uibhistadeasairisgeighbeinnnafaoghla'
     }
