@@ -1,11 +1,13 @@
 MANNUAL_WARD_NAME_EDITS_2007 = {
-    'busbyclarkstoneaglesham':'busbyclarkstoneagleshamward',
+    # 'busbyclarkstoneaglesham':'busbyclarkstoneagleshamward',
     'ste?rnabhaghadeas':'steornabhaghadeas',
     'ste?rnabhaghatuath':'steornabhaghatuath',
     'landcaithnessward':'landwardcaithness',
     'eileanach?o':'eileanacheo',
     'invernessmillburn':'invernessmilburn',
-    'monifiethsidlaw':'monifeithsidlaw'
+    'monifiethsidlaw':'monifeithsidlaw',
+    'landcaithness':'landwardcaithness',
+    'busbyclarkstoneagleshamward':'busbyclarkstoneaglesham'
 }
 
 WARD_2007_COL_RENAME_DICT = {

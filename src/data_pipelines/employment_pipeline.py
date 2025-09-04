@@ -129,7 +129,8 @@ def main():
         df = interpolate_df(df, ['unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family'])
         employment_data_list.append(df)
     employment_data = pd.concat(employment_data_list, ignore_index=True)
-    
+    employment_data = employment_data[['ward_code', 'year', 'month', 'unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family']]
+
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
 
@@ -138,7 +139,8 @@ def main():
         'unemployed_adults',
         'long_term_sick_or_disabled',
         'caring_for_family',
-        'date'
+        'year',
+        'month'
     ]
 
     if DB_URL is not None:

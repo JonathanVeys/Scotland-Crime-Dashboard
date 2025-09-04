@@ -107,6 +107,10 @@ def expand_date_range(df:pd.DataFrame, date_col:str, ward_col:str):
     df = pd.concat([df.iloc[[0]], blank_rows, df.iloc[[1]]]).reset_index(drop=True)
 
     df[ward_col] = df.loc[0, ward_col]
+
+    df['year'] = df['date'].dt.year
+    df['month'] = df['date'].dt.month
+    df = df.drop('date', axis=1)
     
     return df
 
