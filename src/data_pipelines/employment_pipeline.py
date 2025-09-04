@@ -1,123 +1,73 @@
-from typing import Dict, List, Callable
+from typing import Dict, List
+from dotenv import load_dotenv     
+import os 
+
 
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
-from src.data_pipelines.preprocessing.utils import normalise_text, rename_column_names, subset_columns
+from src.data_pipelines.preprocessing.utils import normalise_text, rename_column_names, subset_columns, BasePipeline, expand_date_range, interpolate_df
 from src.data_pipelines.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007, MANNUAL_WARD_NAME_EDITS_2022
+from src.data_pipelines.DB.update_database import update_db
 
 
-class EmploymentPipeline:
-    def __init__(self, path:str, ward_name_col:str):
-        self.path = path
-        self.ward_name_col = ward_name_col
+
+class EmploymentPipeline(BasePipeline):
+    def __init__(self, path: str):
+        super().__init__(path)
+
+    def calculate_percentages(self, division_map:Dict[str, str]):
+        '''
+        Calculates column percentages by giving a dictionary with column numerator and denominator pairs
+        '''
+        self._check_list_subset(list(division_map.keys()), list(self.data.columns))
+        self._check_list_subset(list(division_map.values()), list(self.data.columns))
+
+
+        for key, value in division_map.items():
+            self.data[key] = self.divide_col(key, value)
+
+        return self
+    
+    def mulitply_columns(self, mul_map:Dict[str, str]):
+        for key, value in mul_map.items():
+            self.data[key] = self.mul_cols(key, value)
         
-    def load_data(self, skiprows:int=0, skipfooter:int=0):
-        '''
-        Loads a csv file from memory
-        '''
-        self.data  = pd.read_csv(self.path, skiprows=skiprows, skipfooter=skipfooter)
         return self
     
-    def rename_cols(self, rename_map:Dict[str,str]):
-        '''
-        Renames the columns in a dataframe using a dictionary
-        '''
-        self._check_list_subset(list(rename_map.keys()), list(self.data.columns))
-        
-        self.data = self.data.rename(
-            columns=rename_map
-        )
+    def groupby(self, grouping_columns:List[str]|str, summing_column:List[str]|str):
+        self._check_list_subset(grouping_columns, list(self.data.columns))
+        self._check_list_subset(summing_column, list(self.data.columns))
+
+        self.data = self.data.groupby(grouping_columns)[summing_column].sum().reset_index()
         return self
-    
-    def divide_cols(self, new_col_name:str, col_numerator_name:str, col_denominator_name:str):
-        '''
-        Divides two columns in a dataframe rowise
-        '''
-        self._check_list_subset([col_numerator_name, col_denominator_name], list(self.data.columns))
-
-        self.data[new_col_name] = self.data[col_numerator_name].div(self.data[col_denominator_name])
-        return self
-    
-    def sum_cols(self, new_col_name:str, cols_to_add:List[str]):
-        '''
-        Adds a series of columns in a dataframe rowise
-        '''
-        self._check_list_subset(cols_to_add, list(self.data.columns))
-
-        self.data[new_col_name] = self.data[cols_to_add].sum(axis=1)
-        return self
-    
-    def subset_columns(self, column_subset_list:List[str]):
-        '''
-        Subsets a dataframe by selecting columns
-        '''
-        self._check_list_subset(column_subset_list, list(self.data.columns))
-
-        self.data = self.data[column_subset_list]
-        return self
-    
-    def normalise_column(self, normalise_func:Callable[[str], str], col_to_normalise:str):
-        self._check_list_subset(col_to_normalise, list(self.data.columns))
-
-        if not self.data[col_to_normalise].dtype == str:
-            self.data[col_to_normalise] = self.data[col_to_normalise].astype(str)
-
-        self.data[col_to_normalise] = self.data[col_to_normalise].apply(normalise_func)
-        return self
-    
-    def left_join(self, data_to_merge:pd.DataFrame, merging_column:str):
-        self._check_list_subset(merging_column, list(self.data.columns))
-        self._check_list_subset(merging_column, list(data_to_merge.columns))
-
-        if not isinstance(data_to_merge, pd.DataFrame):
-            raise ValueError(f'Expectetd pd.DataFrame, instead got {type(data_to_merge).__name__}')
-        
-        self.data = self.data.merge(data_to_merge, on=merging_column, how='left')
-        return self
-    
-    def apply_mannual_edits(self, col:str, mannual_edits:Dict[str,str]):
-        self._check_list_subset(col, list(self.data.columns))
-
-        self.data[col] = self.data[col].map(
-            lambda x:mannual_edits.get(x,x)
-        )
-        return self
-    
-    def drop_columns(self, columns_to_drop:List[str]|str):
-        self._check_list_subset(columns_to_drop, list(self.data.columns))
-
-        self.data = self.data.drop(columns_to_drop, axis=1)
-        return self
-    
-
-    def _check_list_subset(self, columns_to_check:List[str]|str, columns_list:List[str]|str):
-        '''
-        A helper function for checking if one list is a subset of another list
-        '''
-        if isinstance(columns_to_check, str):
-            columns_to_check = [columns_to_check]
-
-        missing_cols = [col for col in columns_to_check if col not in columns_list]
-        if missing_cols:
-            raise ValueError(f'{missing_cols} were expected in column names but were missing')
-        
-
     
 COLUMN_RENAME_DICT_2007 = {
-            'Electoral Ward 2007':'ward_name_2007',
-            'All people aged 16 to 74':'total_pop',
-            'Economically inactive: Looking after home or family':'caring_for_family',
-            'Economically inactive: Long-term sick or disabled':'long_term_sick_or_disabled',
-            'Unemployed people aged 16 to 74: Aged 16 to 24':'young_unemployed'
-    }
+    'Electoral Ward 2007':'ward_name_2007',
+    'All people aged 16 to 74':'total_pop',
+    'Economically inactive: Looking after home or family':'caring_for_family',
+    'Economically inactive: Long-term sick or disabled':'long_term_sick_or_disabled',
+    'Economically active: Unemployed':'unemployed_adults'
+}
 
 COLUMN_RENAME_DICT_2022 = {
     'Economic activity - 20 groups, all':'ward_name_2022',
     'All people aged 16 and over':'total_pop',
     'Economically inactive - Looking after home/ family':'caring_for_family',
     'Economically inactive - Long term sick or disabled':'long_term_sick_or_disabled',
+}
 
+percentage_cols_2011 = {
+    'caring_for_family':'total_pop',
+    'long_term_sick_or_disabled':'total_pop',
+    'unemployed_adults':'economically_active_adults'
+}
+
+percentage_cols_2022 = {
+    'caring_for_family':'total_pop',
+    'long_term_sick_or_disabled':'total_pop',
+    'unemployed_adults':'economically_active_adults'
 }
 
 def main():
@@ -134,96 +84,67 @@ def main():
     ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
 
     employment_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2011.csv'
-    employment_data_2011 = EmploymentPipeline(employment_2011_path, 'Electoral Ward 2007')
+    employment_data_2011 = EmploymentPipeline(employment_2011_path)
     employment_data_2011 = (
         employment_data_2011.load_data(skiprows=12, skipfooter=5)
-        .rename_cols(COLUMN_RENAME_DICT_2007)
-        .sum_cols('employed_adults', ['Economically active: Employee: Full-time', 'Economically active: Self-employed', 'Economically active: Unemployed'])
-        .divide_cols(new_col_name='caring_for_family_pct', col_numerator_name='caring_for_family', col_denominator_name='total_pop')
-        .divide_cols(new_col_name='long_term_sick_or_disabled_pct', col_numerator_name='long_term_sick_or_disabled', col_denominator_name='total_pop')
-        .divide_cols(new_col_name='young_unemployed_pct', col_numerator_name='young_unemployed', col_denominator_name='total_pop')
-        .divide_cols(new_col_name='unemployment_pct', col_numerator_name='Economically active: Unemployed', col_denominator_name='employed_adults')
-        .subset_columns(['ward_name_2007', 'unemployment_pct', 'young_unemployed_pct', 'long_term_sick_or_disabled_pct', 'caring_for_family_pct'])
-        .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2007')
-        .apply_mannual_edits('ward_name_2007', MANNUAL_WARD_NAME_EDITS_2007)
-        .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')
-        .drop_columns('ward_name_2007')
+        .rename_cols(COLUMN_RENAME_DICT_2007)                                                                                                   #Rename columns
+        .sum_cols('economically_active_adults', [col for col in employment_data_2011.data.columns if 'economically active' in col.lower()])     #Sum columns to find total economically active adults
+        .calculate_percentages(percentage_cols_2011)                                                                                            #Calculate column percentages
+        .subset_columns(['ward_name_2007', 'unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family'])                #Select a subset of columns from the data
+        .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2007')                                                     #Normalise the ward name column
+        .apply_mannual_edits('ward_name_2007', MANNUAL_WARD_NAME_EDITS_2007)                                                                    #Apply the mannual edits dictionary
+        .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')                                                        #Left join the data with a ward name to ward code lookup
+        .drop_columns('ward_name_2007')                                                                                                         #Drop the ward name column
+        .left_join(data_to_merge=pd.DataFrame(ward_2007_2022_map), merging_column='ward_code_2007')
+        .mulitply_columns(mul_map={col:'overlap_pct' for col in employment_data_2011.data.columns if is_numeric_dtype(employment_data_2011.data[col])})
+        .groupby(['ward_code_2022'], ['unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family'])
+        .rename_cols({'ward_code_2022':'ward_code'})
+        .extract_df()
     )
     
     employment_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2022.csv'
-    employment_data_2022 = EmploymentPipeline(employment_2022_path, '')
+    employment_data_2022 = EmploymentPipeline(employment_2022_path)
     employment_data_2022 = (
         employment_data_2022.load_data(skiprows=8, skipfooter=5)
         .rename_cols(COLUMN_RENAME_DICT_2022)
-        .sum_cols('employed_adults', ['Economically Active (excluding full-time students) - Employee - Total', 'Economically Active (excluding full-time students) - Self-employed with employees - Total', 'Economically Active (excluding full-time students) - Self-employed without employees - Total'])
+        .sum_cols('economically_active_adults', ['Economically Active (excluding full-time students) - Total', 'Economically Active full-time students - Total'])
         .sum_cols('unemployed_adults', ['Economically Active (excluding full-time students) - Unemployed - Available for work', 'Economically Active full-time students - Unemployed - Available for work'])
-        .divide_cols(new_col_name='caring_for_family_pct', col_numerator_name='caring_for_family', col_denominator_name='total_pop')
-        .divide_cols(new_col_name='long_term_sick_or_disabled_pct', col_numerator_name='long_term_sick_or_disabled', col_denominator_name='total_pop')
-        .divide_cols(new_col_name='unemployment_pct', col_numerator_name='unemployed_adults', col_denominator_name='employed_adults')
-        .subset_columns(['ward_name_2022', 'caring_for_family_pct', 'long_term_sick_or_disabled_pct', 'unemployment_pct'])
+        .calculate_percentages(percentage_cols_2022)
+        .subset_columns(['ward_name_2022', 'caring_for_family', 'long_term_sick_or_disabled', 'unemployed_adults'])
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2022')
         .apply_mannual_edits('ward_name_2022', MANNUAL_WARD_NAME_EDITS_2022)
         .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
         .drop_columns('ward_name_2022')
-
+        .rename_cols({'ward_code_2022':'ward_code'})
+        .extract_df()
     )
+
+    employment_data_2011['date'] = pd.to_datetime('2011-01-01')
+    employment_data_2022['date'] = pd.to_datetime('2022-01-01')
+    employment_data = pd.concat([employment_data_2011, employment_data_2022], ignore_index=True)
     
- 
-
-
-def main2():
-    ward_boundaries_2007_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/4th_Review_2007_2017_All_Scotland_wards/All_Scotland_wards_4th.shp'
-    ward_2007_geometry, ward_code_2007_lookup = load_and_prepare_shapefile(ward_boundaries_2007_path, 'ONS_2010', 'Name', '2007', 27700, normalise_text)
-
-    ward_boundaries_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp'
-    ward_2022_geometry, ward_code_2022_lookup = load_and_prepare_shapefile(ward_boundaries_2022_path, 'WD25CD', 'WD25NM', '2022', 27700, normalise_text)
-
-    ward_2007_2022_map = calculate_overlap(ward_2007_geometry, ward_2022_geometry)
-    ward_2007_2022_map = ward_2007_2022_map[['ward_code_2007', 'ward_code_2022', 'overlap_pct']]
-
-    ward_code_2007_lookup = apply_disambiguation(ward_code_2007_lookup, 'ward_code_2007', 'ward_name_2007', NAME_DISAMBIGUATION_2007)
-    ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
-
-
-
-
-    employment_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2011.csv'
-    employment_2011 = pd.read_csv(employment_2011_path, skiprows=12, skipfooter=3)
+    employment_data_list = []
+    for _, group_df in employment_data.groupby(['ward_code']):
+        df = expand_date_range(group_df.reset_index(drop=True), 'date', 'ward_code')
+        df = interpolate_df(df, ['unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family'])
+        employment_data_list.append(df)
+    employment_data = pd.concat(employment_data_list, ignore_index=True)
     
-    employment_cols = ['Economically active: Employee: Full-time', 'Economically active: Self-employed', 'Economically active: Unemployed']
-    unemployment_cols = ['Economically active: Unemployed']
+    load_dotenv()
+    DB_URL = os.getenv("SUPABASE_DB_URL")
 
-    employment_2011['unemployment_pct'] = employment_2011[unemployment_cols].sum(axis=1) / employment_2011[employment_cols].sum(axis=1)
+    required_columns = [
+        'ward_code',
+        'unemployed_adults',
+        'long_term_sick_or_disabled',
+        'caring_for_family',
+        'date'
+    ]
 
-    COLUMN_RENAME_DICT = {
-            'Economic activity then Unemployed people aged 16 to 74 then Unemployed people aged 16 to 74, Never worked and long-term unemployed':'ward_name_2007',
-            'All people aged 16 to 74':'total_pop',
-            'Economically inactive: Looking after home or family':'caring_for_family',
-            'Economically inactive: Long-term sick or disabled':'long_term_sick_or_disabled',
-            'Unemployed people aged 16 to 74: Aged 16 to 24':'young_unemployed',
-            'unemployment_pct':'unemployment_pct'
-    }
+    if DB_URL is not None:
+        update_db(data=employment_data, db_url=DB_URL, table_name='ward_employemnt_data', required_columns=required_columns)
 
-    employment_2011 = rename_column_names(
-        employment_2011,
-        rename_dict=COLUMN_RENAME_DICT
-    )
-    employment_2011 = subset_columns(employment_2011, list(COLUMN_RENAME_DICT.values()))
-    
-    for col in ['caring_for_family', 'long_term_sick_or_disabled', 'young_unemployed']:
-        employment_2011[col] = employment_2011[col].div(employment_2011['total_pop'])
 
-    employment_2011 = employment_2011.drop('total_pop', axis=1)
-    employment_2011['ward_name_2007'] = employment_2011['ward_name_2007'].apply(normalise_text)
-
-    employment_2011['ward_name_2007'] = employment_2011['ward_name_2007'].map(
-        lambda x:MANNUAL_WARD_NAME_EDITS_2007.get(x,x)
-    )
-    employment_2011 = employment_2011.merge(ward_code_2007_lookup, on='ward_name_2007', how='left').drop('ward_name_2007', axis=1)
-
-    employment_2011['date_start'] = pd.to_datetime('2011-01-01')
-
-    print(employment_2011.sort_values('young_unemployed', ascending=False))
 
 
 
