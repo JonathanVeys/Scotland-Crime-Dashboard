@@ -127,15 +127,9 @@ def interpolate_df(row:pd.DataFrame, columns_to_interpolate:List[str]):
     return row
 
 class BasePipeline:
-    def __init__(self, path:str):
-        self.path = path
-        
-    def load_data(self, skiprows:int=0, skipfooter:int=0):
-        '''
-        Loads a csv file from memory
-        '''
-        self.data  = pd.read_csv(self.path, skiprows=skiprows, skipfooter=skipfooter, engine='python')
-        return self
+    def __init__(self, data:pd.DataFrame):
+        self.data = data
+    
     
     def rename_cols(self, rename_map:Dict[str,str]):
         '''
@@ -209,7 +203,7 @@ class BasePipeline:
         self.data = self.data.merge(data_to_merge, on=merging_column, how='left')
         return self
     
-    def apply_mannual_edits(self, col:str, mannual_edits:Dict[str,str]):
+    def apply_manual_edits(self, col:str, mannual_edits:Dict[str,str]):
         self._check_list_subset(col, list(self.data.columns))
 
         self.data[col] = self.data[col].map(

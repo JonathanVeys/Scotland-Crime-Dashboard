@@ -7,15 +7,26 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
-from src.data_pipelines.preprocessing.utils import normalise_text, rename_column_names, subset_columns, BasePipeline, expand_date_range, interpolate_df
-from src.data_pipelines.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007, MANNUAL_WARD_NAME_EDITS_2022
+from src.data_pipelines.preprocessing.utils import normalise_text, BasePipeline, expand_date_range, interpolate_df
+from src.data_pipelines.pipelines.mapping.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007, MANNUAL_WARD_NAME_EDITS_2022
 from src.data_pipelines.DB.update_database import update_db
 
 
 
 class EmploymentPipeline(BasePipeline):
-    def __init__(self, path: str):
-        super().__init__(path)
+    def __init__(self, path: str, skiprows:int=0, skipfooter:int=0):
+        self.path = path
+        self.skiprows = skiprows
+        self.skipfooter = skipfooter
+        self.data = self.load_data()
+        super().__init__(self.data)
+
+    def load_data(self):
+        '''
+        Loads a csv file from memory
+        '''
+        data  = pd.read_csv(self.path, skiprows=self.skiprows, skipfooter=self.skipfooter, engine='python')
+        return data
 
     def calculate_percentages(self, division_map:Dict[str, str]):
         '''
@@ -84,15 +95,14 @@ def main():
     ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
 
     employment_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2011.csv'
-    employment_data_2011 = EmploymentPipeline(employment_2011_path)
+    employment_data_2011 = EmploymentPipeline(employment_2011_path, skiprows=12, skipfooter=5)
     employment_data_2011 = (
-        employment_data_2011.load_data(skiprows=12, skipfooter=5)
-        .rename_cols(COLUMN_RENAME_DICT_2007)                                                                                                   #Rename columns
+        employment_data_2011.rename_cols(COLUMN_RENAME_DICT_2007)                                                                                                   #Rename columns
         .sum_cols('economically_active_adults', [col for col in employment_data_2011.data.columns if 'economically active' in col.lower()])     #Sum columns to find total economically active adults
         .calculate_percentages(percentage_cols_2011)                                                                                            #Calculate column percentages
         .subset_columns(['ward_name_2007', 'unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family'])                #Select a subset of columns from the data
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2007')                                                     #Normalise the ward name column
-        .apply_mannual_edits('ward_name_2007', MANNUAL_WARD_NAME_EDITS_2007)                                                                    #Apply the mannual edits dictionary
+        .apply_manual_edits('ward_name_2007', MANNUAL_WARD_NAME_EDITS_2007)                                                                    #Apply the mannual edits dictionary
         .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')                                                        #Left join the data with a ward name to ward code lookup
         .drop_columns('ward_name_2007')                                                                                                         #Drop the ward name column
         .left_join(data_to_merge=pd.DataFrame(ward_2007_2022_map), merging_column='ward_code_2007')
@@ -103,16 +113,15 @@ def main():
     )
     
     employment_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/employment_data/Census_Employment_2022.csv'
-    employment_data_2022 = EmploymentPipeline(employment_2022_path)
+    employment_data_2022 = EmploymentPipeline(employment_2022_path, skiprows=8, skipfooter=5)
     employment_data_2022 = (
-        employment_data_2022.load_data(skiprows=8, skipfooter=5)
-        .rename_cols(COLUMN_RENAME_DICT_2022)
+        employment_data_2022.rename_cols(COLUMN_RENAME_DICT_2022)
         .sum_cols('economically_active_adults', ['Economically Active (excluding full-time students) - Total', 'Economically Active full-time students - Total'])
         .sum_cols('unemployed_adults', ['Economically Active (excluding full-time students) - Unemployed - Available for work', 'Economically Active full-time students - Unemployed - Available for work'])
         .calculate_percentages(percentage_cols_2022)
         .subset_columns(['ward_name_2022', 'caring_for_family', 'long_term_sick_or_disabled', 'unemployed_adults'])
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2022')
-        .apply_mannual_edits('ward_name_2022', MANNUAL_WARD_NAME_EDITS_2022)
+        .apply_manual_edits('ward_name_2022', MANNUAL_WARD_NAME_EDITS_2022)
         .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
         .drop_columns('ward_name_2022')
         .rename_cols({'ward_code_2022':'ward_code'})

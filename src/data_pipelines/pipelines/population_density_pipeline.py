@@ -10,7 +10,7 @@ from scraping.utils import get_ward_excel_link, download_excel, read_excel_sheet
 from preprocessing.data_preprocessing import ward_pop_processing, ward_area_processing
 from DB.update_database import update_db
 
-def ward_pop_gather() -> dict:
+def ward_pop_gather():
     '''
     Function that webscrapes nrscotland to gather ward population data.
 
@@ -34,7 +34,6 @@ def ward_pop_gather() -> dict:
         raise ValueError('Error: File URL is None')
 
     data = download_excel(file_url, sheet_name='2001')
-    print(data)
     
     # if content is not None:
     #     data = read_excel_sheets(content, 3)
@@ -43,7 +42,7 @@ def ward_pop_gather() -> dict:
 
     return data
 
-def ward_size_gather() -> pd.DataFrame:
+def ward_size_gather():
     '''
     Function that webscrappes data.gov to get the area data for the electoral wards.
 

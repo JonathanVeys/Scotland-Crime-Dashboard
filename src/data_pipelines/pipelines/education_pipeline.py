@@ -8,12 +8,22 @@ from pandas.api.types import is_numeric_dtype
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
 from src.data_pipelines.preprocessing.utils import BasePipeline, expand_date_range, interpolate_df, normalise_text
 from src.data_pipelines.DB.update_database import update_db
-from src.data_pipelines.mapping import WARD_2007_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2007, WARD_2022_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2022, NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022
-
+from src.data_pipelines.pipelines.mapping.mapping import WARD_2007_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2007, WARD_2022_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2022, NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022
 
 class EducationPipeline(BasePipeline):
-    def __init__(self, path: str):
-        super().__init__(path)
+    def __init__(self, path: str, skiprows:int=0, skipfooter:int=0):
+        self.path = path
+        self.skiprows = skiprows
+        self.skipfooter = skipfooter
+        self.data = self.load_data(skiprows=self.skiprows, skipfooter=self.skipfooter)
+        super().__init__(self.data)
+
+    def load_data(self, skiprows:int=0, skipfooter:int=0):
+        '''
+        Loads a csv file from memory
+        '''
+        data  = pd.read_csv(self.path, skiprows=skiprows, skipfooter=skipfooter, engine='python')
+        return data
 
     def pivot_data(self, columns:str, values:str,  index:str):
         self._check_list_subset([columns, values, index], list(self.data.columns))
@@ -94,12 +104,11 @@ def main():
 
 
     education_data_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/education_data/education_ward_data_2011.csv'
-    education_data_2011 = EducationPipeline(education_data_2011_path)
+    education_data_2011 = EducationPipeline(education_data_2011_path, skiprows=12, skipfooter=5)
     education_data_2011 = (
-        education_data_2011.load_data(skiprows=12, skipfooter=5)
-        .rename_cols(WARD_2007_COL_RENAME_DICT)
+        education_data_2011.rename_cols(WARD_2007_COL_RENAME_DICT)
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2007')
-        .apply_mannual_edits(col='ward_name_2007', mannual_edits=MANNUAL_WARD_NAME_EDITS_2007)
+        .apply_manual_edits(col='ward_name_2007', mannual_edits=MANNUAL_WARD_NAME_EDITS_2007)
         .subset_columns(column_subset_list=list(WARD_2007_COL_RENAME_DICT.values()))
         .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')
         .drop_columns('ward_name_2007')
@@ -115,12 +124,11 @@ def main():
     )
 
     education_data_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/education_data/eductaion_ward_data_2022.csv'
-    education_data_2022 = EducationPipeline(education_data_2022_path)
+    education_data_2022 = EducationPipeline(education_data_2022_path, skiprows=10, skipfooter=8)
     education_data_2022 = (
-        education_data_2022.load_data(skiprows=10, skipfooter=8)
-        .rename_cols(WARD_2022_COL_RENAME_DICT)
+        education_data_2022.rename_cols(WARD_2022_COL_RENAME_DICT)
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2022')
-        .apply_mannual_edits(col='ward_name_2022', mannual_edits=MANNUAL_WARD_NAME_EDITS_2022)
+        .apply_manual_edits(col='ward_name_2022', mannual_edits=MANNUAL_WARD_NAME_EDITS_2022)
         .subset_columns(column_subset_list=list(WARD_2022_COL_RENAME_DICT.values()))
         .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
         .pivot_data(columns='qualification', values='count', index='ward_code_2022')
