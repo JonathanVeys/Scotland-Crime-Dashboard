@@ -1,74 +1,87 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;   /* remove browser default margins */
+    padding: 0;
+    overflow: hidden;
+}
+
+* {
+    box-sizing: border-box;
+  }
+
 .main-container {
     display: flex;
-    flex-direction: column;
-    height: 97vh;
+    flex-direction: column;   /* stack child containers */
+    height: 100vh;             /* full height of parent */
+    width: 100vw;              /* full width of parent */
+    background-color: #808080;
 }
 
-
-.input-box {
-    flex: 1;
-    border: 2px solid black;
-    border-radius: 5px;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.output-box {
+.container {
     display: flex;
     flex-direction: row;
-    flex: 12;
-    border: 2px solid black;
-    border-radius: 5px;
+    flex: 1;
+    background-color: #808080;
 }
 
-.choropleth-map-div {
+.crime-graph-container {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    background-color: #303030;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+.scotland-map-container {
+    display: flex;
+    flex-direction: column;
     flex: 2;
+    background-color: #303030;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+
+.pie-chart-container {
     display: flex;
-    flex-direction: column;
-    border: 2px solid black;
-    border-radius: 5px;
+    flex: 1;
+    background-color: #303030;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-.scotland-map {
-    flex-grow: 1;
-    width: 100%;
-}
-
-.graphs-div {
+.data-container {
     display: flex;
-    flex-direction: column;
-    flex: 5;
-    border: 2px solid black;
-    border-radius: 5px;
-}
-
-.crime-breakdown-div {
     flex: 1;
-    border: 2px solid black;
-    border-radius: 5px;
+    background-color: #303030;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-.timeseries-div {
+.title-container h3 {
+    margin: 0;            /* remove default top/bottom margins */
+    padding: 0;           /* optional: reset padding too */
+    line-height: 1.2;     /* control text vertical spacing */
+}
+
+.title-container {
+    display: flex;
     flex: 1;
-    border: 2px solid black;
-    border-radius: 5px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-top: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-
-.crime-map {
-    box-sizing: border-box;
-}
-
-.pie-chart {
-    border: 2px solid black;
-    border-radius: 5px;
-    width: 80%;
-}
-
-.timeseries-graph {
-    border: 2px solid black;
-    border-radius: 5px;
-    height: 99%;
+.content-container {
+    display: flex;
+    flex: 13;
 }
