@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 import pandas as pd
 
 from src.data_pipelines.scraping.crime_scrapper import get_crime_data_url, crime_data_scrapper
-from src.data_pipelines.preprocessing.utils import normalise_text, subset_columns, rename_column_names, BasePipeline
+from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
+from src.data_pipelines.preprocessing.utils import normalise_text, subset_columns
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
 from src.data_pipelines.DB.update_database import update_db
 

@@ -10,7 +10,8 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from dotenv import load_dotenv
 
-from src.data_pipelines.preprocessing.utils import BasePipeline, expand_date_range, interpolate_df
+from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
+from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df
 from src.data_pipelines.DB.update_database import update_db
 
 

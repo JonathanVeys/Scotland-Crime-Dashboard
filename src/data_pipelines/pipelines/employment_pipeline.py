@@ -7,7 +7,8 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
-from src.data_pipelines.preprocessing.utils import normalise_text, BasePipeline, expand_date_range, interpolate_df
+from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
+from src.data_pipelines.preprocessing.utils import normalise_text, expand_date_range, interpolate_df
 from src.data_pipelines.pipelines.mapping.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022, MANNUAL_WARD_NAME_EDITS_2007, MANNUAL_WARD_NAME_EDITS_2022
 from src.data_pipelines.DB.update_database import update_db
 
