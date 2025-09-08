@@ -184,11 +184,11 @@ class BasePipeline:
         self.data = self.data[column_subset_list]
         return self
     
-    def normalise_column(self, normalise_func:Callable[[str], str], col_to_normalise:str):
+    def normalise_column(self, normalise_func:Callable, col_to_normalise:str):
         self._check_list_subset(col_to_normalise, list(self.data.columns))
 
-        if not self.data[col_to_normalise].dtype == str:
-            self.data[col_to_normalise] = self.data[col_to_normalise].astype(str)
+        # if not self.data[col_to_normalise].dtype == str:
+        #     self.data[col_to_normalise] = self.data[col_to_normalise].astype(str)
 
         self.data[col_to_normalise] = self.data[col_to_normalise].apply(normalise_func)
         return self

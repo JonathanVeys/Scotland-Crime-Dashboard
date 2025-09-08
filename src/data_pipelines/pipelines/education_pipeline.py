@@ -111,14 +111,15 @@ def main():
         .apply_manual_edits(col='ward_name_2007', mannual_edits=MANNUAL_WARD_NAME_EDITS_2007)
         .subset_columns(column_subset_list=list(WARD_2007_COL_RENAME_DICT.values()))
         .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')
-        .drop_columns('ward_name_2007')
         .pivot_data(columns='qualification', values='count', index='ward_code_2007')
         .rename_cols(EDUCATION_DATA_2011_COLUMN_RENAME)
-        .calculate_percentages({col:'total_population' for col in ['qual_level_1', 'qual_level_2', 'qual_level_3', 'qual_level_4', 'no_qual']})
-        .drop_columns('total_population')
+        .sum_cols('pop_with_qual', ['qual_level_3', 'qual_level_4'])
+        .sum_cols('pop_without_qual', ['qual_level_1', 'qual_level_2', 'no_qual'])
+        .calculate_percentages({col:'total_population' for col in ['pop_with_qual', 'pop_without_qual']})
+        .drop_columns([col for col in education_data_2011.data.columns if col not in ['ward_code_2007', 'pop_with_qual', 'pop_without_qual']])
         .left_join(pd.DataFrame(ward_2007_2022_map), 'ward_code_2007')
         .mulitply_columns(mul_map={col:'overlap_pct' for col in education_data_2011.data.columns if is_numeric_dtype(education_data_2011.data[col])})
-        .groupby('ward_code_2022', ['qual_level_1', 'qual_level_2', 'qual_level_3', 'qual_level_4', 'no_qual'])
+        .groupby('ward_code_2022', ['pop_with_qual', 'pop_without_qual'])
         .set_date_column('date', '2011-01-01')
         .extract_df()
     )
@@ -133,24 +134,25 @@ def main():
         .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
         .pivot_data(columns='qualification', values='count', index='ward_code_2022')
         .rename_cols(EDUCATION_DATA_2022_COLUMN_RENAME)
-        .sum_cols('qual_level_3', ['qual_level_3', 'qual_level_3.5'])
-        .drop_columns('qual_level_3.5')
-        .calculate_percentages({col:'total_population' for col in ['qual_level_1', 'qual_level_2', 'qual_level_3', 'qual_level_4', 'no_qual']})
-        .drop_columns('total_population')
+        .sum_cols('pop_with_qual', ['qual_level_3', 'qual_level_3.5', 'qual_level_4'])
+        .sum_cols('pop_without_qual', ['qual_level_1', 'qual_level_2', 'no_qual'])
+        .calculate_percentages({col:'total_population' for col in ['pop_with_qual', 'pop_without_qual']})
+        .drop_columns([col for col in education_data_2022.data.columns if col not in ['ward_code_2022', 'pop_with_qual', 'pop_without_qual']])
         .set_date_column('date', '2022-01-01')
         .extract_df()
     )
+
 
     education_data = pd.concat([education_data_2011, education_data_2022], ignore_index=True)
     
     education_data_list = []
     for _, group_df in education_data.groupby(['ward_code_2022']):
         df = expand_date_range(group_df, 'date', 'ward_code_2022')
-        df = interpolate_df(df, ['qual_level_1', 'qual_level_2', 'qual_level_3', 'qual_level_4', 'no_qual'])
+        df = interpolate_df(df, ['pop_with_qual', 'pop_without_qual'])
         education_data_list.append(df)
     education_data = pd.concat(education_data_list, ignore_index=True)
     education_data = education_data.rename(columns={'ward_code_2022':'ward_code'})
-    
+
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
 
@@ -158,16 +160,12 @@ def main():
         'ward_code',
         'year',
         'month',
-        'qual_level_1',
-        'qual_level_2',
-        'qual_level_3',
-        'qual_level_4',
-        'no_qual',
+        'pop_with_qual',
+        'pop_without_qual',
     ]
 
     if DB_URL is not None:
         update_db(data=education_data, db_url=DB_URL, table_name='ward_education_data', required_columns=required_columns)
-
 
 
 

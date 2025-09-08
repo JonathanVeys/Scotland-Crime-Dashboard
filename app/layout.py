@@ -46,7 +46,11 @@ layout = html.Div([
                 html.H3('Map')
             ], className='title-container'),
             html.Div([
-                dcc.Graph(figure=fig, style={"height": "100%", "width": "100%"}, config={"displayModeBar": False})
+                dcc.Graph(
+                    figure=fig,
+                    config={"displayModeBar": False, "responsive": True},
+                    style={"width": "100%", "height": "100%", "min-height": "0px"}
+)
             ], className='content-container')
         ], className='scotland-map-container', style={'margin-left':'5px'})
     ], className='container', style={'flex':'2'}),
