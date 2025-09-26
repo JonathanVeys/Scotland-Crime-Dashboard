@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from dotenv import load_dotenv
 
 from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
-from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df
+from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df, interpolate_forward
 from src.data_pipelines.DB.update_database import update_db
 
 
@@ -67,7 +67,7 @@ class PopulationDensityPipeline(BasePipeline):
         '''
         Creates a bs4 soup object
         '''
-        if isinstance(content, bytes):
+        if isinstance(content, str):
             soup = BeautifulSoup(content, parser)
         else:
             raise TypeError(f'Expected type bytes, instead got type ({type(content)})')
@@ -163,7 +163,7 @@ def main():
         ward_area_data.filter_df('WD24CD', 'S')
         .drop_columns([col for col in ward_area_data.data.columns if col not in ['WD24CD', 'Shape__Area', 'date']])
         .rename_cols({'WD24CD':'ward_code', 'Shape__Area':'area'})
-        .normalise_column(normalise_func=lambda x: x/100000, col_to_normalise='area')
+        .normalise_column(normalise_func=lambda x: x/1000000, col_to_normalise='area')
         .extract_df()
     )
 
@@ -177,18 +177,18 @@ def main():
     for _, group_df in population_density_data.groupby(['ward_code']):
         df = expand_date_range(group_df, 'date', 'ward_code')
         df = interpolate_df(df, ['population_density'])
+        df = interpolate_forward(df, 'date', ['population_density'], pd.to_datetime('2025-01-01'))
         population_density_data_list.append(df)
 
     population_density_data = pd.concat(population_density_data_list, ignore_index=True)
-
+    
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
 
     required_columns = [
         'ward_code',
         'population_density',
-        'year',
-        'month'
+        'date'
     ]
 
     if DB_URL is not None:
@@ -199,5 +199,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-

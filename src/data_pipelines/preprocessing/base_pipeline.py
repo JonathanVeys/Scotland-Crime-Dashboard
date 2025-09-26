@@ -111,3 +111,4 @@ class BasePipeline:
         A function for extracting the data from the class
         '''
         return self.data
+    

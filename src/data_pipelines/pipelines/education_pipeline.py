@@ -1,8 +1,11 @@
 import os
+import json
 from dotenv import load_dotenv 
 from typing import Dict, List   
+from pathlib import Path
 
 import pandas as pd
+from pandera.pandas import DataFrameSchema, Column, DateTime
 from pandas.api.types import is_numeric_dtype
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
@@ -10,6 +13,7 @@ from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
 from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df, normalise_text
 from src.data_pipelines.DB.update_database import update_db
 from src.data_pipelines.pipelines.mapping.mapping import WARD_2007_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2007, WARD_2022_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2022, NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022
+import tests.test_crime_pipeline as tests
 
 class EducationPipeline(BasePipeline):
     def __init__(self, path: str, skiprows:int=0, skipfooter:int=0):
@@ -51,7 +55,7 @@ class EducationPipeline(BasePipeline):
 
         return self   
 
-    def mulitply_columns(self, mul_map:Dict[str, str]):
+    def multiply_columns(self, mul_map:Dict[str, str]):
         for key, value in mul_map.items():
             self.data[key] = self.mul_cols(key, value)
         
@@ -69,32 +73,22 @@ class EducationPipeline(BasePipeline):
         return self
 
 
-EDUCATION_DATA_2011_COLUMN_RENAME={
-    'ward_code_2007':'ward_code_2007',
-    'All people aged 16 and over: Level 1':'qual_level_1',
-    'All people aged 16 and over: Level 2':'qual_level_2',
-    'All people aged 16 and over: Level 3':'qual_level_3',
-    'All people aged 16 and over: Level 4 and above':'qual_level_4',
-    'All people aged 16 and over: No qualifications':'no_qual',
-    'All people aged 16 and over: Total':'total_population'
-}
 
-EDUCATION_DATA_2022_COLUMN_RENAME={
-    'ward_code_2022':'ward_code_2022',
-    'All people aged 16 and over':'total_population',
-    'No qualifications':'no_qual',
-    'Lower school qualifications':'qual_level_1',
-    'Upper school qualifications':'qual_level_2',
-    'Further Education and sub-degree Higher Education qualifications incl. HNC/HNDs':'qual_level_3',
-    'Apprenticeship qualifications':'qual_level_3.5',
-    'Degree level qualifications or above':'qual_level_4'
-}
 
 def main():
-    ward_boundaries_2007_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/4th_Review_2007_2017_All_Scotland_wards/All_Scotland_wards_4th.shp'
+    CURRENT_DIR = Path(__file__).resolve().parent
+    PACKAGE_DIR = CURRENT_DIR.parent.parent.parent
+
+    with open(PACKAGE_DIR / 'src/data_pipelines/pipelines/config/transformations.json') as f:
+        config = json.load(f)
+    education_data_2011_config = config['education_data_2011']
+    education_data_2022_config = config['education_data_2022']
+
+
+    ward_boundaries_2007_path = str(PACKAGE_DIR / 'data' / 'geojson_data' / '4th_Review_2007_2017_All_Scotland_wards' / 'All_Scotland_wards_4th.shp')
     ward_2007_geometry, ward_code_2007_lookup = load_and_prepare_shapefile(ward_boundaries_2007_path, 'ONS_2010', 'Name', '2007', 27700, normalise_text)
 
-    ward_boundaries_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp'
+    ward_boundaries_2022_path = str(PACKAGE_DIR / 'data' / 'geojson_data' / 'scottish_wards_2022_shapefile' / 'Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp')
     ward_2022_geometry, ward_code_2022_lookup = load_and_prepare_shapefile(ward_boundaries_2022_path, 'WD25CD', 'WD25NM', '2022', 27700, normalise_text)
 
     ward_2007_2022_map = calculate_overlap(ward_2007_geometry, ward_2022_geometry)
@@ -104,43 +98,39 @@ def main():
     ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
 
 
-    education_data_2011_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/education_data/education_ward_data_2011.csv'
+    education_data_2011_path = str(PACKAGE_DIR / education_data_2011_config['path'])
     education_data_2011 = EducationPipeline(education_data_2011_path, skiprows=12, skipfooter=5)
     education_data_2011 = (
-        education_data_2011.rename_cols(WARD_2007_COL_RENAME_DICT)
-        .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2007')
-        .apply_manual_edits(col='ward_name_2007', mannual_edits=MANNUAL_WARD_NAME_EDITS_2007)
-        .subset_columns(column_subset_list=list(WARD_2007_COL_RENAME_DICT.values()))
-        .left_join(data_to_merge=ward_code_2007_lookup, merging_column='ward_name_2007')
-        .pivot_data(columns='qualification', values='count', index='ward_code_2007')
-        .rename_cols(EDUCATION_DATA_2011_COLUMN_RENAME)
+        education_data_2011.pivot_data(columns='Highest level of qualification', values='Count', index='Electoral Ward 2007')
+        .rename_cols(education_data_2011_config['transformations']['column_rename'])
+        .normalise_column(normalise_text, col_to_normalise='ward_name_2007')
+        .apply_manual_edits(col='ward_name_2007', mannual_edits=education_data_2011_config['transformations']['mannual_ward_edits'])
+        .left_join(ward_code_2007_lookup, 'ward_name_2007')
         .sum_cols('pop_with_qual', ['qual_level_3', 'qual_level_4'])
         .sum_cols('pop_without_qual', ['qual_level_1', 'qual_level_2', 'no_qual'])
         .calculate_percentages({col:'total_population' for col in ['pop_with_qual', 'pop_without_qual']})
         .drop_columns([col for col in education_data_2011.data.columns if col not in ['ward_code_2007', 'pop_with_qual', 'pop_without_qual']])
         .left_join(pd.DataFrame(ward_2007_2022_map), 'ward_code_2007')
-        .mulitply_columns(mul_map={col:'overlap_pct' for col in education_data_2011.data.columns if is_numeric_dtype(education_data_2011.data[col])})
+        .multiply_columns(mul_map={col:'overlap_pct' for col in education_data_2011.data.columns if is_numeric_dtype(education_data_2011.data[col])})
         .groupby('ward_code_2022', ['pop_with_qual', 'pop_without_qual'])
         .set_date_column('date', '2011-01-01')
         .extract_df()
     )
 
-    education_data_2022_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/education_data/eductaion_ward_data_2022.csv'
+    education_data_2022_path = str(PACKAGE_DIR / 'data' / 'education_data' / 'education_ward_data_2022.csv')
     education_data_2022 = EducationPipeline(education_data_2022_path, skiprows=10, skipfooter=8)
     education_data_2022 = (
-        education_data_2022.rename_cols(WARD_2022_COL_RENAME_DICT)
+        education_data_2022.pivot_data(columns='Highest level of qualification', values='Count', index='Electoral Ward 2022')
+        .rename_cols(education_data_2022_config['transformations']['column_rename'])
         .normalise_column(normalise_func=normalise_text, col_to_normalise='ward_name_2022')
-        .apply_manual_edits(col='ward_name_2022', mannual_edits=MANNUAL_WARD_NAME_EDITS_2022)
-        .subset_columns(column_subset_list=list(WARD_2022_COL_RENAME_DICT.values()))
-        .left_join(data_to_merge=ward_code_2022_lookup, merging_column='ward_name_2022')
-        .pivot_data(columns='qualification', values='count', index='ward_code_2022')
-        .rename_cols(EDUCATION_DATA_2022_COLUMN_RENAME)
+        .apply_manual_edits(col='ward_name_2022', mannual_edits=education_data_2022_config['transformations']['mannual_ward_edits'])
+        .left_join(ward_code_2022_lookup, merging_column='ward_name_2022')
         .sum_cols('pop_with_qual', ['qual_level_3', 'qual_level_3.5', 'qual_level_4'])
         .sum_cols('pop_without_qual', ['qual_level_1', 'qual_level_2', 'no_qual'])
         .calculate_percentages({col:'total_population' for col in ['pop_with_qual', 'pop_without_qual']})
         .drop_columns([col for col in education_data_2022.data.columns if col not in ['ward_code_2022', 'pop_with_qual', 'pop_without_qual']])
         .set_date_column('date', '2022-01-01')
-        .extract_df()
+        .extract_df()   
     )
 
 
@@ -159,11 +149,23 @@ def main():
 
     required_columns = [
         'ward_code',
-        'year',
-        'month',
+        'date',
         'pop_with_qual',
         'pop_without_qual',
     ]
+
+    schema = DataFrameSchema({
+        'ward_code':Column(str),
+        'pop_with_qual':Column(float),
+        'pop_without_qual':Column(float),
+        'date':Column(DateTime, nullable=False)
+    })
+
+
+    tests.test_timeseries(education_data, start_date='2011-01-01', end_date='2022-01-01', ward_code_col='ward_code')
+    tests.test_NA(education_data, cols=['ward_code', 'pop_with_qual', 'pop_without_qual', 'date'])
+    tests.test_columns_exist(education_data, cols=['ward_code', 'pop_with_qual', 'pop_without_qual', 'date'])
+    tests.test_schema(education_data, schema=schema)
 
     if DB_URL is not None:
         update_db(data=education_data, db_url=DB_URL, table_name='ward_education_data', required_columns=required_columns)

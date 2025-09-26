@@ -1,4 +1,6 @@
 import pandas as pd
+from numpy import nan
+from typing import List
 
 def interpolate_column(df:pd.DataFrame, column_to_interpolate:str, grouping_column:str):
     '''
@@ -62,3 +64,5 @@ def crime_rates_processing(data:pd.DataFrame) -> pd.DataFrame:
     data = data.groupby(['council_name','ward_name', 'year', 'month', 'crime_group', 'group_description']).sum().reset_index()
 
     return data
+
+

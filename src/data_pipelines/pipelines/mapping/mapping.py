@@ -1,5 +1,4 @@
 MANNUAL_WARD_NAME_EDITS_2007 = {
-    # 'busbyclarkstoneaglesham':'busbyclarkstoneagleshamward',
     'ste?rnabhaghadeas':'steornabhaghadeas',
     'ste?rnabhaghatuath':'steornabhaghatuath',
     'landcaithnessward':'landwardcaithness',
