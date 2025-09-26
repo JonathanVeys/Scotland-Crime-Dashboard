@@ -46,14 +46,9 @@ def main():
 
     with open(PACKAGE_DIR / 'src/data_pipelines/pipelines/config/transformations.json') as f:
         config = json.load(f)
+
+
     crime_data_config = config['crime_data']
-
-
-    base_url = crime_data_config['path']['base_url']
-    page_url = crime_data_config['path']['page_url']
-
-    crime_urls = get_crime_data_url(base_url, page_url)
-    crime_data = crime_data_scrapper(crime_urls)
 
     ward_boundaries_2007_path = ' /Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/data/geojson_data/4th_Review_2007_2017_All_Scotland_wards/All_Scotland_wards_4th.shp'
     ward_2007_geometry, ward_code_2007_lookup = load_and_prepare_shapefile(ward_boundaries_2007_path, 'ONS_2010', 'Name', '2007', 27700, normalise_text)
@@ -66,6 +61,14 @@ def main():
 
     ward_code_2007_lookup = apply_disambiguation(ward_code_2007_lookup, 'ward_code_2007', 'ward_name_2007', NAME_DISAMBIGUATION_2007)
     ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
+
+
+
+    base_url = crime_data_config['path']['base_url']
+    page_url = crime_data_config['path']['page_url']
+
+    crime_urls = get_crime_data_url(base_url, page_url)
+    crime_data = crime_data_scrapper(crime_urls)
 
     ward_crime_list = []
     for _, value in crime_data.items():

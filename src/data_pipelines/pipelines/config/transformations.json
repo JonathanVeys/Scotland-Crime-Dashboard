@@ -95,7 +95,22 @@
   },
 
   "ward_boundaries_2022": {
-    "path":"data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp"
+    "path":"data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp",
+    "transformations": {
+      "column_rename": {
+        
+      }
+    }
+  },
+
+  "ward_boundaries_2007": {
+    "path": "data/geojson_data/4th_Review_2007_2017_All_Scotland_wards/All_Scotland_wards_4th.shp",
+    "transformations": {
+      "column_rename": {
+        "ONS_2010":"ward_code_2007",
+        "Name":"ward_name_2007"
+      }
+    }
   },
 
   "crime_data": {
