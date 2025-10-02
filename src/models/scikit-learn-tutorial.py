@@ -1,15 +1,28 @@
-from sklearn.datasets import load_iris
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.linear_model import LinearRegression
+import sklearn as skl
+from dotenv import load_dotenv 
+import os
 
 import matplotlib.pyplot as plt
+from sqlalchemy import create_engine
+import pandas as pd
 
-X, y = load_iris(return_X_y=True)
-mod = LinearRegression()
-mod.fit(X,y)
 
-predictions = mod.predict(X)
-predictions_comparison = zip(predictions, y)
+load_dotenv()
+DB_URL = os.getenv("SUPABASE_DB_URL")
 
-plt.scatter(y, predictions)
-plt.show()
+if DB_URL is not None:
+    engine = create_engine(DB_URL)
+
+query = (
+    '''
+    SELECT *
+    FROM ward_education_data;
+    '''
+)
+df = pd.read_sql(query, engine)
+
+for ward_code, group_data in df.groupby(['ward_code']):
+    plt.plot(group_data['date'], group_data['pop_with_qual'])
+    plt.plot(group_data['date'], group_data['pop_without_qual'])
+    plt.show()
+    break

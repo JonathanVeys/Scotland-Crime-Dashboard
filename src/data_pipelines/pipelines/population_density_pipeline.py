@@ -38,7 +38,10 @@ class PopulationDensityPipeline(BasePipeline):
 
         #Retrieve bytes for xlsx file
         page_data_url = cls._extract_data_url(soup, '.xlsx$')
-        data_url = urljoin(base=base_url, url=page_data_url)
+        if isinstance(page_data_url, str):
+            data_url = urljoin(base=base_url, url=page_data_url)
+        else:
+            raise TypeError(f'Expected type str, instead got type ({type(page_data_url)})')
         data_bytes = cls._url_response(data_url)
 
         #Load the data into a dataframe
@@ -67,7 +70,7 @@ class PopulationDensityPipeline(BasePipeline):
         '''
         Creates a bs4 soup object
         '''
-        if isinstance(content, str):
+        if isinstance(content, str|bytes):
             soup = BeautifulSoup(content, parser)
         else:
             raise TypeError(f'Expected type bytes, instead got type ({type(content)})')
