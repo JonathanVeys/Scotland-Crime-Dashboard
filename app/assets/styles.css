@@ -12,7 +12,7 @@ html, body {
 
 .main-container {
     display: flex;
-    flex-direction: column;   /* stack child containers */
+    flex-direction: row;   /* stack child containers */
     height: 100vh;             /* full height of parent */
     width: 100vw;              /* full width of parent */
     background-color: #808080;
@@ -20,7 +20,7 @@ html, body {
 
 .container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex: 1;
     background-color: #808080;
 }

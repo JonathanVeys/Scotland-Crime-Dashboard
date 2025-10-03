@@ -1,33 +1,28 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
-import asyncio
-from numpy import random
-from src.models.predict_model import CrimePredictor
+from pathlib import Path
 
-
-app = FastAPI()
-
-@app.get("/")
-async def root():
-    return {'message':'Hello, world'}
-
-
-@app.get('/predict')
-async def predict(ward_code):
-    predictor: CrimePredictor = app.state.pre
-    crime = .predict_crime(ward_code=ward_code)
-    return {ward_code:crime}
+from src.models.predict_model import CrimePredictor, CrimeService
+from src.DB.DatabaseClient import DatabaseClient
+from src.api import history
+from src.api import predict
 
 
 @asynccontextmanager
-async def startup(app):
-    async with asyncio.timeout(10):
-        crime_predictor = CrimePredictor(model_path = '/Users/jonathancrocker/Documents/Python/Scotland Crime Dashboard/src/models/linear_model.pkl')
-        await crime_predictor.load_model()
-        app.state.predictor = crime_predictor
-        print("✅ Predictor loaded")
-    try:
-        yield 
-    finally:
-        async with asyncio.timeout(10):
-            print("👋 Cleaned up")
+async def lifespan(app: FastAPI):
+    #Load DatabaseClient
+    database_client = DatabaseClient()
+
+    #Load CrimePredictor
+    PACKAGE_DIR = Path(__file__).resolve().parent.parent.parent
+    CrimePredictor_path = str(PACKAGE_DIR / 'src/models/linear_model.pkl')
+    crime_predictor = CrimePredictor(CrimePredictor_path)
+
+    crime_service = CrimeService(crime_predictor, database_client)
+    app.state.crime_service = crime_service
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
+app.include_router(history.router)
+app.include_router(predict.router)
