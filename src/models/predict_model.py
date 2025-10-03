@@ -21,6 +21,9 @@ class CrimePredictor():
         return model
 
     def generate_prediction_row(self, data:pd.DataFrame) -> pd.DataFrame:
+        '''
+        
+        '''
         numeric_cols = data.select_dtypes(include='number').columns
         new_row ={
             col:None if col in numeric_cols else data.loc[len(data)-1, col] for col in data.columns
@@ -41,7 +44,7 @@ class CrimePredictor():
         data.loc[len(data)] = new_row #type:ignore
         return data
 
-    def data_preprocessing(self, data:pd.DataFrame) -> dict:
+    def data_preprocessing(self, data:pd.DataFrame) -> pd.DataFrame:
         '''
         
         '''
@@ -56,12 +59,12 @@ class CrimePredictor():
         data["crime_3month_avg"] = data["count"].shift(1).rolling(window=3).mean()
 
         data = data[~pd.isna(data["crime_last_three_months"])]    
-        prediction_row = data.iloc[-1, 1:].to_dict()
+        prediction_row = data.iloc[[-1], 1:]
 
         return prediction_row
     
 
-    def predict(self, predict_row:dict):
+    def predict(self, predict_row:dict) -> dict:
         '''
         Function that predicts upcoming crime rates.
 
@@ -83,7 +86,6 @@ class CrimePredictor():
 class CrimeService():
     def __init__(self, predictor:CrimePredictor, DBClient:DatabaseClient):
         self.predictor = predictor
-        self.predictor.load_model()
 
         self.DB = DBClient
 
