@@ -1,7 +1,6 @@
 import joblib
 import pandas as pd
 import numpy as np
-import asyncio
 from typing import List
 
 from sklearn.linear_model import LinearRegression
@@ -41,8 +40,8 @@ class CrimePredictor():
             next_val = model.predict(np.array([[len(data)]]))[0]
             new_row[col] = next_val
 
-        data.loc[len(data)] = new_row #type:ignore
-        return data
+        output_df = pd.concat([data, pd.DataFrame([new_row])], ignore_index=True)
+        return output_df
 
     def data_preprocessing(self, data:pd.DataFrame) -> pd.DataFrame:
         '''
@@ -64,7 +63,7 @@ class CrimePredictor():
         return prediction_row
     
 
-    def predict(self, predict_row:dict) -> dict:
+    def predict(self, df:pd.DataFrame) -> dict:
         '''
         Function that predicts upcoming crime rates.
 
@@ -75,7 +74,6 @@ class CrimePredictor():
             -A number representing the the predicted crime next month in based on the data
         '''
 
-        df = pd.DataFrame([predict_row])
         df.drop(columns=['ward_code', 'date'], axis=1, inplace=True)
         df = df[['pop_with_qual', 'pop_without_qual', 'unemployed_adults', 'long_term_sick_or_disabled', 'caring_for_family', 'crime_last_month', 'crime_last_two_months', 'crime_last_three_months', 'crime_3month_avg', 'pop_density_log']]
         output = self.model.predict(df)
@@ -86,10 +84,12 @@ class CrimePredictor():
 class CrimeService():
     def __init__(self, predictor:CrimePredictor, DBClient:DatabaseClient):
         self.predictor = predictor
-
         self.DB = DBClient
 
-    def get_ward_history(self, ward_code:str) -> List[dict]:
+    def get_ward_history(self, ward_code:str) -> pd.DataFrame:
+        '''
+        
+        '''
         ward_crime_data = pd.DataFrame(self.DB.get_crime_data(ward_code=ward_code))
         ward_education_data = pd.DataFrame(self.DB.get_education_data(ward_code=ward_code))
         ward_employment_data = pd.DataFrame(self.DB.get_employment_data(ward_code=ward_code))
@@ -101,13 +101,16 @@ class CrimeService():
             .merge(ward_education_data, on=['ward_code', 'date'], how="inner")
             .merge(ward_employment_data, on=['ward_code', 'date'], how="inner")
             .merge(ward_population_data, on=['ward_code', 'date'], how="inner")
-        ).to_dict(orient='records')
+        )
 
         return ward_history
     
     def predict(self, ward_code:str, months:int) -> dict:
+        '''
+        
+        '''
         historic_data = self.get_ward_history(ward_code)
-        prediction_row = self.predictor.generate_prediction_row(pd.DataFrame(historic_data))
+        prediction_row = self.predictor.generate_prediction_row(historic_data)
         prediction_row_processed = self.predictor.data_preprocessing(prediction_row)
         predicted_crime = self.predictor.predict(prediction_row_processed)
 
