@@ -131,22 +131,8 @@ def main():
 
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
-    databaseEngine = DatabaseWriter(DB_URL=DB_URL)
-    databaseEngine.update_database(employment_data, 'ward_employemnt_data')
-
-    # required_columns = [
-    #     'ward_code',
-    #     'unemployed_adults',
-    #     'long_term_sick_or_disabled',
-    #     'caring_for_family',
-    #     'date'
-    # ]
-
-    # if DB_URL is not None:
-    #     update_db(data=employment_data, db_url=DB_URL, table_name='ward_employemnt_data', required_columns=required_columns)
-
-
-
+    databaseClient = DatabaseWriter(DB_URL=DB_URL)
+    databaseClient.update_database(employment_data, 'ward_employemnt_data')
 
 
 

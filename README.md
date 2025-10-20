@@ -51,5 +51,5 @@ The system automates data ingestion, harmonisation, model training, and dashboar
 │   │   └── scraping                #Scrapping logic to gather data
 │   └── models                      #Model training and evaluation
 ├── tests                           #Unit test for data before pushing to DB
-├── README.md
+└── README.md
 

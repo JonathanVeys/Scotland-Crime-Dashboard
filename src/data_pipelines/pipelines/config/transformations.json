@@ -97,8 +97,11 @@
   "ward_boundaries_2022": {
     "path":"data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp",
     "transformations": {
-      "column_rename": {
-        
+      "name_disambiguation": {
+        "S13002737":"northislesorkneyislands",
+        "S13002772":"northislesshetlandislands",
+        "S13002830":"northeastdundeecity",
+        "S13003133":"northeastglasgowcity"
       }
     }
   },
@@ -109,6 +112,12 @@
       "column_rename": {
         "ONS_2010":"ward_code_2007",
         "Name":"ward_name_2007"
+      },
+      "name_disambiguation": {
+        "S13002772":"northislesorkney",
+        "S13002737":"northislesshetland",
+        "S13002550":"northeastdundeecity",
+        "S13002661":"northeastglasgowcity"
       }
     }
   },

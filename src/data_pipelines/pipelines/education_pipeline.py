@@ -10,9 +10,8 @@ from pandas.api.types import is_numeric_dtype
 
 from src.data_pipelines.preprocessing.spacial_processing import calculate_overlap, load_and_prepare_shapefile, apply_disambiguation
 from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
-from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df, normalise_text
-from src.data_pipelines.DB.update_database import update_db
-from src.data_pipelines.pipelines.mapping.mapping import WARD_2007_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2007, WARD_2022_COL_RENAME_DICT, MANNUAL_WARD_NAME_EDITS_2022, NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022
+from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df, normalise_text, subset_columns
+from src.DB.DatabaseClient import DatabaseWriter
 import tests.test_crime_pipeline as tests
 
 class EducationPipeline(BasePipeline):
@@ -84,18 +83,20 @@ def main():
     education_data_2011_config = config['education_data_2011']
     education_data_2022_config = config['education_data_2022']
 
-
-    ward_boundaries_2007_path = str(PACKAGE_DIR / 'data' / 'geojson_data' / '4th_Review_2007_2017_All_Scotland_wards' / 'All_Scotland_wards_4th.shp')
+    ward_boundary_2007_config = config['ward_boundaries_2007']
+    ward_boundary_2022_config = config['ward_boundaries_2022']
+    
+    ward_boundaries_2007_path = PACKAGE_DIR / ward_boundary_2007_config['path']
     ward_2007_geometry, ward_code_2007_lookup = load_and_prepare_shapefile(ward_boundaries_2007_path, 'ONS_2010', 'Name', '2007', 27700, normalise_text)
 
-    ward_boundaries_2022_path = str(PACKAGE_DIR / 'data' / 'geojson_data' / 'scottish_wards_2022_shapefile' / 'Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp')
+    ward_boundaries_2022_path = PACKAGE_DIR / ward_boundary_2022_config['path']
     ward_2022_geometry, ward_code_2022_lookup = load_and_prepare_shapefile(ward_boundaries_2022_path, 'WD25CD', 'WD25NM', '2022', 27700, normalise_text)
 
     ward_2007_2022_map = calculate_overlap(ward_2007_geometry, ward_2022_geometry)
-    ward_2007_2022_map = ward_2007_2022_map[['ward_code_2007', 'ward_code_2022', 'overlap_pct']]
+    ward_2007_2022_map = subset_columns(ward_2007_2022_map, ['ward_code_2007', 'ward_code_2022', 'overlap_pct'])
 
-    ward_code_2007_lookup = apply_disambiguation(ward_code_2007_lookup, 'ward_code_2007', 'ward_name_2007', NAME_DISAMBIGUATION_2007)
-    ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', NAME_DISAMBIGUATION_2022)
+    ward_code_2007_lookup = apply_disambiguation(ward_code_2007_lookup, 'ward_code_2007', 'ward_name_2007', ward_boundary_2007_config['transformations']['name_disambiguation'])
+    ward_code_2022_lookup = apply_disambiguation(ward_code_2022_lookup, 'ward_code_2022', 'ward_name_2022', ward_boundary_2022_config['transformations']['name_disambiguation'])
 
 
     education_data_2011_path = str(PACKAGE_DIR / education_data_2011_config['path'])
@@ -128,7 +129,7 @@ def main():
         .sum_cols('pop_with_qual', ['qual_level_3', 'qual_level_3.5', 'qual_level_4'])
         .sum_cols('pop_without_qual', ['qual_level_1', 'qual_level_2', 'no_qual'])
         .calculate_percentages({col:'total_population' for col in ['pop_with_qual', 'pop_without_qual']})
-        .drop_columns([col for col in education_data_2022.data.columns if col not in ['ward_code_2022', 'pop_with_qual', 'pop_without_qual']])
+        .drop_columns([col for col in education_data_2022.data.columns if col not in ['ward_name_2022', 'ward_code_2022', 'pop_with_qual', 'pop_without_qual']])
         .set_date_column('date', '2022-01-01')
         .extract_df()   
     )
@@ -144,15 +145,6 @@ def main():
     education_data = pd.concat(education_data_list, ignore_index=True)
     education_data = education_data.rename(columns={'ward_code_2022':'ward_code'})
 
-    load_dotenv()
-    DB_URL = os.getenv("SUPABASE_DB_URL")
-
-    required_columns = [
-        'ward_code',
-        'date',
-        'pop_with_qual',
-        'pop_without_qual',
-    ]
 
     schema = DataFrameSchema({
         'ward_code':Column(str),
@@ -161,14 +153,16 @@ def main():
         'date':Column(DateTime, nullable=False)
     })
 
-
     tests.test_timeseries(education_data, start_date='2011-01-01', end_date='2022-01-01', ward_code_col='ward_code')
     tests.test_NA(education_data, cols=['ward_code', 'pop_with_qual', 'pop_without_qual', 'date'])
     tests.test_columns_exist(education_data, cols=['ward_code', 'pop_with_qual', 'pop_without_qual', 'date'])
     tests.test_schema(education_data, schema=schema)
 
-    if DB_URL is not None:
-        update_db(data=education_data, db_url=DB_URL, table_name='ward_education_data', required_columns=required_columns)
+    load_dotenv()
+    DB_URL = os.getenv("SUPABASE_DB_URL")
+    databaseClient = DatabaseWriter(DB_URL=DB_URL)
+    databaseClient.update_database(education_data, 'ward_education_data')
+
 
 
 

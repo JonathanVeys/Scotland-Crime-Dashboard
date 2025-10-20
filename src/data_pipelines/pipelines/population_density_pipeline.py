@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
 from src.data_pipelines.preprocessing.utils import expand_date_range, interpolate_df, interpolate_forward
-from src.data_pipelines.DB.update_database import update_db
+from src.DB.DatabaseClient import DatabaseWriter
 
 
 class PopulationDensityPipeline(BasePipeline):
@@ -187,15 +187,9 @@ def main():
     
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
+    databaseClient = DatabaseWriter(DB_URL=DB_URL)
+    databaseClient.update_database(population_density_data, 'ward_population_density')
 
-    required_columns = [
-        'ward_code',
-        'population_density',
-        'date'
-    ]
-
-    if DB_URL is not None:
-        update_db(data=population_density_data, db_url=DB_URL, table_name='ward_population_density', required_columns=required_columns)
 
 
 

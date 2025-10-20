@@ -7,7 +7,7 @@ import pandas as pd
 
 from src.data_pipelines.preprocessing.spacial_processing import load_and_prepare_shapefile
 from src.data_pipelines.preprocessing.utils import rename_column_names
-from src.data_pipelines.DB.update_database import update_db
+from src.DB.DatabaseClient import DatabaseWriter
 
 
 if __name__ == '__main__':
@@ -27,11 +27,6 @@ if __name__ == '__main__':
     
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
+    databaseClient = DatabaseWriter(DB_URL=DB_URL)
+    databaseClient.update_database(ward_code_lookup, 'ward_code_name')
 
-    required_columns = [
-        'ward_code',
-        'ward_name'
-    ]   
-
-    if DB_URL is not None:
-        update_db(data=ward_code_lookup, db_url=DB_URL, table_name='ward_code_name', required_columns=required_columns)
