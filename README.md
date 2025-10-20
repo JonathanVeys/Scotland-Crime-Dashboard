@@ -38,18 +38,18 @@ The system automates data ingestion, harmonisation, model training, and dashboar
 ## 🧱 Project Structure
 
 ```bash
-scotland-crime-dashboard/
-├── src/
-│   ├── etl/                  # Data extraction, cleaning, transformation
-│   ├── database/             # Supabase schema & SQL scripts
-│   ├── modelling/            # ML models and evaluation pipelines
-│   ├── api/                  # FastAPI backend routes
-│   ├── dashboard/            # Dash frontend components
-│   ├── tests/                # Unit and integration tests
-│   └── utils/                # Shared helpers (logging, config, constants)
-├── data/                     # Local data cache (not tracked in Git)
-├── notebooks/                # Exploratory analysis and visualisation
-├── requirements.txt or pyproject.toml
-├── Dockerfile
-├── .github/workflows/ci.yml  # Continuous integration pipeline
-└── README.md
+├── app                             #Dashboard frontend
+│   └── assets                      #Dashboard styling
+├── src                             #Source code for project
+│   ├── DB                          #Lightweight database client for querying and updating database
+│   ├── api                         #FastAPI backend routes
+│   ├── data_pipelines              #ETL pipelines
+│   │   ├── pipelines               #Directory to store data pipelines
+│   │   │   ├── config              #Config files for each of the data sources to store metadata
+│   │   │   └── mapping             #Depricated: Old way of storing config
+│   │   ├── preprocessing           #Base processing pipelines and processing functions
+│   │   └── scraping                #Scrapping logic to gather data
+│   └── models                      #Model training and evaluation
+├── tests                           #Unit test for data before pushing to DB
+├── README.md
+
