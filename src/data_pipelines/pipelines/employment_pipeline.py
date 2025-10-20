@@ -13,6 +13,7 @@ from src.data_pipelines.preprocessing.base_pipeline import BasePipeline
 from src.data_pipelines.preprocessing.utils import normalise_text, expand_date_range, interpolate_df
 from src.data_pipelines.pipelines.mapping.employment_mapping import NAME_DISAMBIGUATION_2007, NAME_DISAMBIGUATION_2022
 from src.data_pipelines.DB.update_database import update_db
+from src.DB.DatabaseClient import DatabaseWriter
 
 
 
@@ -130,17 +131,19 @@ def main():
 
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")
+    databaseEngine = DatabaseWriter(DB_URL=DB_URL)
+    databaseEngine.update_database(employment_data, 'ward_employemnt_data')
 
-    required_columns = [
-        'ward_code',
-        'unemployed_adults',
-        'long_term_sick_or_disabled',
-        'caring_for_family',
-        'date'
-    ]
+    # required_columns = [
+    #     'ward_code',
+    #     'unemployed_adults',
+    #     'long_term_sick_or_disabled',
+    #     'caring_for_family',
+    #     'date'
+    # ]
 
-    if DB_URL is not None:
-        update_db(data=employment_data, db_url=DB_URL, table_name='ward_employemnt_data', required_columns=required_columns)
+    # if DB_URL is not None:
+    #     update_db(data=employment_data, db_url=DB_URL, table_name='ward_employemnt_data', required_columns=required_columns)
 
 
 

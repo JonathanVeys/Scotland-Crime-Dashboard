@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from src.models.predict_model import CrimePredictor, CrimeService
-from src.DB.DatabaseClient import DatabaseClient
+from src.DB.DatabaseClient import DatabaseReader
 from src.api import history
 from src.api import predict
 
@@ -11,7 +11,7 @@ from src.api import predict
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     #Load DatabaseClient
-    database_client = DatabaseClient()
+    database_client = DatabaseReader()
 
     #Load CrimePredictor
     PACKAGE_DIR = Path(__file__).resolve().parent.parent.parent
