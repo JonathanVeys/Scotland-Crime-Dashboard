@@ -11,7 +11,7 @@ from pathlib import Path
 
 from src.data_pipelines.preprocessing.spacial_processing import load_and_prepare_shapefile
 from src.data_pipelines.preprocessing.utils import normalise_text
-from src.DB.DatabaseClient import DatabaseClient
+from src.DB.DatabaseClient import DatabaseReader
 
 
 
@@ -24,7 +24,7 @@ def register_callbacks(app):
         Input('crime-map', 'id')
     )
     def init_map(selected_date):
-        database_client = DatabaseClient()
+        database_client = DatabaseReader()
         crime_data = pd.DataFrame(database_client.get_crime_data())
         ward_name_data = pd.DataFrame(database_client.get_ward_names())
         crime_data = crime_data.merge(ward_name_data, on='ward_code')

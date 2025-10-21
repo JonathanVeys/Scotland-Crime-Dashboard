@@ -10,12 +10,8 @@ import numpy as np
 import geopandas as gpd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-import os
 from pathlib import Path
 
-
-from src.data_pipelines.preprocessing.spacial_processing import load_and_prepare_shapefile
-from src.data_pipelines.preprocessing.utils import normalise_text
 
 
 

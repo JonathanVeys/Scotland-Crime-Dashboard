@@ -14,10 +14,14 @@ class DatabasePushError(BaseException):
 
 class BaseDatabaseClient:
     def __init__(self, DB_URL:str|None=None) -> None:
-        load_dotenv()
-        self.db_url = DB_URL or os.getenv('SUPABASE_DB_URL')
+        if DB_URL is None:
+            load_dotenv()
+            self.db_url = DB_URL or os.getenv('SUPABASE_DB_URL')
+            print(self.db_url)
+        else:
+            self.db_url = DB_URL
         if not self.db_url:
-            raise ValueError('UPABASE_DB_URL not found in environment variables.')
+            raise ValueError('SUPABASE_DB_URL not found in environment variables.')
         
         self.engine = create_engine(
             url = self.db_url,   
@@ -116,3 +120,8 @@ class DatabaseWriter(BaseDatabaseClient):
             print('Database error: {e}')
             raise
 
+
+
+if __name__ == '__main__':
+    test = DatabaseReader()
+    print(test.db_url)
