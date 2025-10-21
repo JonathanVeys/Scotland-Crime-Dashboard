@@ -22,7 +22,7 @@ class BaseDatabaseClient:
             self.db_url = DB_URL
         if not self.db_url:
             raise ValueError('SUPABASE_DB_URL not found in environment variables.')
-        
+        print(self.db_url)
         self.engine = create_engine(
             url = self.db_url,   
         )
@@ -124,4 +124,4 @@ class DatabaseWriter(BaseDatabaseClient):
 
 if __name__ == '__main__':
     test = DatabaseReader()
-    print(test.db_url)
+    print(test.get_crime_data())

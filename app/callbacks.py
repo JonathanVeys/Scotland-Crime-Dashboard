@@ -31,7 +31,14 @@ def register_callbacks(app):
         crime_data['count'] = np.log(crime_data['count'])
 
         CURRENT_DIR = Path(__file__).resolve()
-        PACKAGE_DIR = CURRENT_DIR.parent.parent
+        # Walk upwards until you find the data folder
+        for parent in CURRENT_DIR.parents:
+            if (parent / "data").exists():
+                PACKAGE_DIR = parent
+                break
+        else:
+            raise FileNotFoundError("Could not find project root containing 'data' folder")
+
 
         shapefile_path = str(PACKAGE_DIR / 'data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp')
         shapefile, _ = load_and_prepare_shapefile(shapefile_path, 'WD25CD', 'WD25NM', '2022', 4326, normalise_text)
