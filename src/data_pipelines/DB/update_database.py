@@ -28,3 +28,5 @@ def update_db(data:pd.DataFrame, db_url:str, table_name:str, required_columns:li
         print(f"Error: Update failed due to: {ex}")
 
 
+
+

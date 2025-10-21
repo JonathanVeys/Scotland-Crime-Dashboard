@@ -83,7 +83,7 @@ class BasePipeline:
         self._check_list_subset(col, list(self.data.columns))
 
         self.data[col] = self.data[col].map(
-            lambda x:mannual_edits.get(x,x)
+            lambda x:mannual_edits.get(x,x)  #type: ignore
         )
         return self
     

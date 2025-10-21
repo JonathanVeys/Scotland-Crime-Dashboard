@@ -2,6 +2,7 @@ import os
 from typing import List
 
 import pandas as pd
+import geopandas as gpd
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, IntegrityError
 from dotenv import load_dotenv
@@ -22,7 +23,7 @@ class BaseDatabaseClient:
             self.db_url = DB_URL
         if not self.db_url:
             raise ValueError('SUPABASE_DB_URL not found in environment variables.')
-        print(self.db_url)
+
         self.engine = create_engine(
             url = self.db_url,   
         )
@@ -119,6 +120,20 @@ class DatabaseWriter(BaseDatabaseClient):
         except SQLAlchemyError as e:
             print('Database error: {e}')
             raise
+
+    def update_from_gpd(self, data:gpd.GeoDataFrame, table_name:str):
+        try:
+            data.to_postgis(
+                name=table_name,
+                con=self.engine,
+                if_exists="replace", 
+                index=False
+            )
+            print("✅Successfully updated database values")
+        except SQLAlchemyError as e:
+            print(f'Database error: {e}')
+            raise
+
 
 
 
