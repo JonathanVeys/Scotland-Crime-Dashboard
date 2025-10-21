@@ -18,7 +18,7 @@ class BaseDatabaseClient:
         if DB_URL is None:
             load_dotenv()
             self.db_url = DB_URL or os.getenv('SUPABASE_DB_URL')
-            print(self.db_url)
+          
         else:
             self.db_url = DB_URL
         if not self.db_url:
@@ -103,6 +103,18 @@ class DatabaseReader(BaseDatabaseClient):
         
         return self.fetch(sql, {'ward_code':ward_code, 'date':date})
     
+    def get_shapefile(self):
+        '''
+        
+        '''
+
+        sql = '''
+            SELECT *
+            FROM ward_boundary_data
+        '''
+
+        return gpd.read_postgis(sql, con=self.engine, geom_col='geometry')
+    
 class DatabaseWriter(BaseDatabaseClient):
     def __init__(self, DB_URL: str | None = None) -> None:
         super().__init__(DB_URL)
@@ -139,4 +151,4 @@ class DatabaseWriter(BaseDatabaseClient):
 
 if __name__ == '__main__':
     test = DatabaseReader()
-    print(test.get_crime_data())
+    print(test.get_shapefile())

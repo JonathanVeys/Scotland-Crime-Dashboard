@@ -31,7 +31,6 @@ def register_callbacks(app):
         crime_data['count'] = np.log(crime_data['count'])
 
         CURRENT_DIR = Path(__file__).resolve()
-        # Walk upwards until you find the data folder
         for parent in CURRENT_DIR.parents:
             if (parent / "data").exists():
                 PACKAGE_DIR = parent
@@ -39,31 +38,11 @@ def register_callbacks(app):
         else:
             raise FileNotFoundError("Could not find project root containing 'data' folder")
 
-
         shapefile_path = str(PACKAGE_DIR / 'data/geojson_data/scottish_wards_2022_shapefile/Wards_(May_2025)_Boundaries_UK_BFC_(V2).shp')
-        shapefile, _ = load_and_prepare_shapefile(shapefile_path, 'WD25CD', 'WD25NM', '2022', 4326, normalise_text)
-        geojson = shapefile.set_index("ward_code_2022").__geo_interface__
-
-        # fig = px.choropleth_map(
-        #     crime_data,
-        #     geojson=geojson,
-        #     locations="ward_code",
-        #     color="count",
-        #     color_continuous_scale="RdYlGn_r",
-        #     map_style="carto-positron",
-        #     zoom=5.5, center={"lat": 57.1, "lon": -4.25},
-        #     hover_name="ward_name",  # what appears on hover
-        #     custom_data=["ward_code"]  # pass extra info to hoverData
-        # )
-
-        # fig.update_layout(
-        #     margin=dict(l=5, r=5, t=5, b=5),  
-        #     mapbox=dict(style="white-bg"),
-        #     coloraxis_showscale=False,
-        #     map=dict(style="white-bg"),   # no basemap tiles
-        #     paper_bgcolor="rgba(0,0,0,0)",   # transparent overall background
-        #     plot_bgcolor="rgba(0,0,0,0)"
-        # )
+        shapefile = database_client.get_shapefile()
+ 
+        # shapefile, _ = load_and_prepare_shapefile(shapefile_path, 'WD25CD', 'WD25NM', '2022', 4326, normalise_text, data=shapefile)
+        geojson = shapefile.set_index("ward_code").__geo_interface__
 
         fig = px.choropleth_map(
             crime_data,

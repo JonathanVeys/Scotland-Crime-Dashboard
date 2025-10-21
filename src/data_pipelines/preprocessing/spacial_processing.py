@@ -75,11 +75,17 @@ def calculate_overlap(df_1:gpd.GeoDataFrame, df_2:gpd.GeoDataFrame):
 
     return df
 
-def load_and_prepare_shapefile(path:str, code_col:str, name_col:str, year_id:str, crs_epsg:int, normalise_func:Callable|None = None):
+def load_and_prepare_shapefile(path:str|None, code_col:str, name_col:str, year_id:str, crs_epsg:int, normalise_func:Callable|None = None, data:gpd.GeoDataFrame|None = None):
     '''
 
     '''
-    gdf = gpd.read_file(path, encoding='latin1')
+    if path is not None:
+        gdf = gpd.read_file(path, encoding='latin1')
+    elif data is not None:
+        gdf = data
+    else:
+        raise ValueError(f'Data is empty')
+
     gdf = gdf[gdf[code_col].str.startswith('S')].reset_index(drop=True)
     gdf.rename(
         columns = {
