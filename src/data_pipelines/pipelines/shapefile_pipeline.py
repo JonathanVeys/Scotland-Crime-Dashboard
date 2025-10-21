@@ -59,6 +59,9 @@ if __name__ == '__main__':
         .change_crs(4326)
         .extract_gdf()
     )
+
+    boundary_data["geometry"] = boundary_data["geometry"].simplify(tolerance=0.002, preserve_topology=True)
+
     
     load_dotenv()
     DB_URL = os.getenv("SUPABASE_DB_URL")

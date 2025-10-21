@@ -68,6 +68,7 @@ html, body {
     margin: 0;            /* remove default top/bottom margins */
     padding: 0;           /* optional: reset padding too */
     line-height: 1.2;     /* control text vertical spacing */
+    border-bottom: 3px solid white;
 }
 
 .title-container {
@@ -78,10 +79,29 @@ html, body {
     font-weight: bold;
     padding-left: 10px;
     padding-top: 10px;
+    padding-bottom: 5px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    /* border: 2px solid yellow; */
 }
 
 .content-container {
     display: flex;
     flex: 13;
+}
+
+.slider-container {
+    display: flex;
+    flex: 1;
+    /* border: 2px solid green; */
+}
+
+.prediction-container {
+    display: flex;
+    flex: 20;
+    /* border: 2px solid blue; */
+}
+
+#prediction-slider {
+    width: 100%;
+    margin: 0 20px;
 }

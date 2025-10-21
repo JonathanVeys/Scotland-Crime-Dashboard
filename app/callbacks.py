@@ -1,5 +1,6 @@
 from dash import Input, Output
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -23,7 +24,7 @@ def register_callbacks(app):
         Output('crime-map', 'figure'),
         Input('crime-map', 'id')
     )
-    def init_map(selected_date):
+    def init_crime_graph(selected_date):
         database_client = DatabaseReader()
         crime_data = pd.DataFrame(database_client.get_crime_data())
         ward_name_data = pd.DataFrame(database_client.get_ward_names())
@@ -65,6 +66,36 @@ def register_callbacks(app):
             coloraxis_showscale=False
         )
 
+        return fig
+    
+    @app.callback(
+            Output('crime-plot', 'figure'),
+            Input('crime-map', 'clickData')
+    )
+    def init_crime_plot(clickData):
+        database_client = DatabaseReader()
+
+        ward_code = 'S13002517'
+        ward_name = 'Kintyre and the Islands'
+        if clickData is not None:
+            # extract ward code or name from clickData
+            ward_code = clickData['points'][0]['customdata'][0]  # example
+            ward_name = clickData['points'][0]['hovertext']
+            print(f"Clicked ward: {ward_name} ({ward_code})")
+
+
+        crime_data = pd.DataFrame(database_client.get_crime_data(ward_code=ward_code))
+        
+        fig = px.line(
+            x=crime_data['date'],
+            y=crime_data['count']
+        )
+        fig.update_layout(
+            title=f"Crime data for ward: {ward_name}",
+            xaxis_title="Area / Ward",
+            yaxis_title="Incidents",
+            # paper_bgcolor='#303030'
+        )
         return fig
 
     
