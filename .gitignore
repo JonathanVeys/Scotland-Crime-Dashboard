@@ -1,5 +1,3 @@
-data/
-
 .DS_Store
 
 .env
@@ -13,3 +11,11 @@ venv/
 .vscode/
 
 *.pkl
+
+
+# Ignore everything in the data folder
+data/*
+
+# But keep the shapefile directory
+!data/geojson_data/
+!data/geojson_data/**

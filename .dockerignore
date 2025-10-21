@@ -4,5 +4,10 @@ __pycache__/
 *.pyd
 *.db
 .git
-data/
 venv/
+# Ignore everything in data
+data/*
+
+# Allow shapefile data to be copied into Docker image
+!data/geojson_data/
+!data/geojson_data/**
