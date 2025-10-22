@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 import os
 from pathlib import Path
+import requests
+from datetime import date
 
 
 from src.data_pipelines.preprocessing.spacial_processing import load_and_prepare_shapefile
@@ -22,12 +24,20 @@ def register_callbacks(app):
     '''
     @app.callback(
         Output('crime-map', 'figure'),
-        Input('crime-map', 'id')
+        [Input('crime-map-year-selector', 'value'),
+         Input('crime-map-month-selector', 'value')]
     )
-    def init_crime_graph(selected_date):
+    def init_crime_graph(year:int, month:int):
         database_client = DatabaseReader()
-        crime_data = pd.DataFrame(database_client.get_crime_data())
+
+        formatted_date = date(year, month, 1).strftime("%Y-%m-%d")
+        crime_data = requests.get(f'http://127.0.0.1:8000/history/crime?date={formatted_date}')
+        crime_data = pd.DataFrame(crime_data.json())
+
         ward_name_data = pd.DataFrame(database_client.get_ward_names())
+        ward_name_data = requests.get('http://127.0.0.1:8000/history/wards')
+        ward_name_data = pd.DataFrame(ward_name_data.json())
+        
         crime_data = crime_data.merge(ward_name_data, on='ward_code')
         crime_data['count'] = np.log(crime_data['count'])
 
@@ -73,18 +83,18 @@ def register_callbacks(app):
             Input('crime-map', 'clickData')
     )
     def init_crime_plot(clickData):
-        database_client = DatabaseReader()
-
         ward_code = 'S13002517'
         ward_name = 'Kintyre and the Islands'
         if clickData is not None:
-            # extract ward code or name from clickData
-            ward_code = clickData['points'][0]['customdata'][0]  # example
+            ward_code = clickData['points'][0]['customdata'][0] 
             ward_name = clickData['points'][0]['hovertext']
             print(f"Clicked ward: {ward_name} ({ward_code})")
 
+        crime_data_object = requests.get(f'http://127.0.0.1:8000/history/crime?ward_code={ward_code}')
+        if crime_data_object.status_code == 200:
+            crime_data = crime_data_object.json()
 
-        crime_data = pd.DataFrame(database_client.get_crime_data(ward_code=ward_code))
+        crime_data = pd.DataFrame(crime_data)
         
         fig = px.line(
             x=crime_data['date'],

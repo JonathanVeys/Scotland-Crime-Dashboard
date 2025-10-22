@@ -47,8 +47,8 @@ class DatabaseReader(BaseDatabaseClient):
         sql = '''
             SELECT * 
             FROM ward_crime
-            WHERE (:ward_code IS NULL or ward_code = :ward_code) 
-            AND (:date IS NULL or date = :date)
+            WHERE (ward_code = COALESCE(:ward_code, ward_code)) 
+            AND (date = COALESCE(:date, date))
         '''
         return self.fetch(sql, {'ward_code':ward_code, 'date':date})
     

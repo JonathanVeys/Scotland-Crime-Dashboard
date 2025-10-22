@@ -10,14 +10,25 @@ from src.api import predict
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    #Load DatabaseClient
-    database_client = DatabaseReader()
-
-    #Load CrimePredictor
-    PACKAGE_DIR = Path(__file__).resolve().parent.parent.parent
+    '''
+    
+    '''
+    #The the package root
+    CURRENT_DIR = Path(__file__).resolve()
+    for parent in CURRENT_DIR.parents:
+        if (parent / "src").exists():
+            PACKAGE_DIR = parent
+            break
+    else:
+        raise FileNotFoundError("Could not find project root containing 'src' folder")
+    #Find the path for the model as a string
     CrimePredictor_path = str(PACKAGE_DIR / 'src/models/linear_model.pkl')
+
+    #Load database client and crime predictor client
+    database_client = DatabaseReader()
     crime_predictor = CrimePredictor(CrimePredictor_path)
 
+    #Initialise the crime service class and store it in the app
     crime_service = CrimeService(crime_predictor, database_client)
     app.state.crime_service = crime_service
     yield

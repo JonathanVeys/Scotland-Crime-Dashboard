@@ -6,7 +6,7 @@ from typing import List
 from sklearn.linear_model import LinearRegression
 from dateutil.relativedelta import relativedelta
 
-from src.DB.DatabaseClient import DatabaseClient
+from src.DB.DatabaseClient import DatabaseReader
 
 
 
@@ -82,7 +82,7 @@ class CrimePredictor():
     
 
 class CrimeService():
-    def __init__(self, predictor:CrimePredictor, DBClient:DatabaseClient):
+    def __init__(self, predictor:CrimePredictor, DBClient:DatabaseReader):
         self.predictor = predictor
         self.DB = DBClient
 

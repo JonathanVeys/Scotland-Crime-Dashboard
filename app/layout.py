@@ -1,4 +1,5 @@
 from dash import dcc, html
+import calendar
 
 layout = html.Div([
     html.Div([
@@ -43,6 +44,26 @@ layout = html.Div([
             html.Div([
                 html.H3('Crime Map Scotland')
             ], className='title-container'),
+            html.Div([
+                html.Div([
+                    dcc.Dropdown(
+                        id='crime-map-year-selector',
+                        options = [{'label':str(year), 'value':year} for year in range(2020, 2025)],
+                        value = 2020,
+                        clearable=False,
+                    )
+                ]),
+                html.Div([
+                    dcc.Slider(
+                        id='crime-map-month-selector',
+                        min=1,
+                        max=12,
+                        step=1,
+                        marks={i:calendar.month_name[i] for i in range(1,12)},
+                        value=1
+                    )
+                ], className='slider-container', style={'width': '80%', 'margin': '0 auto'})
+            ], style={'display':'flex', 'flex-direction':'row'}),
             dcc.Graph(
                 id='crime-map',
                 config={"displayModeBar": False, "responsive": True},
